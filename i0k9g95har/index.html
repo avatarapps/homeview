@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Teder 224 m² – proovi oma krundil</title>
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4/dist/model-viewer.min.js"></script>
+<style>
+  :root { --ink:#1d1f22; --muted:#6b6f75; --line:#e3e1dc; --bg:#f6f5f2; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+  header { padding:14px 16px 8px; }
+  h1 { font-size:19px; margin:0; font-weight:650; }
+  .sub { color:var(--muted); font-size:12.5px; margin-top:3px; }
+  model-viewer { width:100%; height:60vh; min-height:360px; background:linear-gradient(#cfdbe6 0%,#e9edf0 55%,#e4e2dc 100%); }
+  .ar-btn { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); border:0; border-radius:24px;
+            background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:12px 20px; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+  .lock { position:absolute; top:10px; left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
+  .ar-bar { display:none; position:absolute; left:8px; right:8px; bottom:16px; gap:8px; flex-direction:column;
+            background:rgba(255,255,255,.9); border-radius:16px; padding:10px; backdrop-filter:blur(6px); }
+  model-viewer[ar-status="session-started"] .ar-bar { display:flex; }
+  model-viewer[ar-status="session-started"] .ar-btn { display:none; }
+  .row { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; }
+  .panel { padding:4px 16px 28px; max-width:900px; }
+  .group { padding:14px 0; border-bottom:1px solid var(--line); }
+  .label { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; display:flex; justify-content:space-between; gap:12px; }
+  .label b { text-transform:none; letter-spacing:0; color:var(--ink); font-weight:600; }
+  .sw { flex:0 0 auto; width:40px; height:40px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); cursor:pointer; padding:0; }
+  .sw[aria-pressed="true"] { box-shadow:0 0 0 2px var(--ink); }
+  .chip { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:20px; padding:8px 13px; font-size:14px; cursor:pointer; color:var(--ink); display:flex; align-items:center; gap:7px; white-space:nowrap; }
+  .chip[aria-pressed="true"] { border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); }
+  .dot { width:16px; height:16px; border-radius:50%; display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,.15); }
+  .custom { display:flex; align-items:center; gap:8px; margin-top:10px; background:#fff; border:1px dashed #cfccc5; border-radius:12px; padding:8px 10px; width:max-content; }
+  .custom input[type=color] { width:34px; height:34px; border:0; padding:0; background:none; cursor:pointer; }
+  .custom input[type=text] { width:96px; font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:8px; text-transform:uppercase; }
+  .custom span { font-size:13px; color:var(--muted); }
+  .note { font-size:12.5px; color:var(--muted); padding-top:14px; }
+  .ar-bar .sw { width:32px; height:32px; }
+  .ar-bar .chip { padding:6px 10px; font-size:13px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Teder 224 m² – proovi oma krundil</h1>
+  <div class="sub">Ligikaudne mudel Soome Maja avaliku plaani põhjal · privaatne demo</div>
+</header>
+
+<model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
+  ar ar-modes="webxr quick-look scene-viewer" ar-scale="fixed" ar-placement="floor"
+  camera-controls touch-action="pan-y" shadow-intensity="1.1" shadow-softness="0.6"
+  environment-image="neutral" tone-mapping="agx" exposure="1.0"
+  camera-orbit="155deg 78deg 30m" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
+  field-of-view="32deg" interaction-prompt="none">
+  <span class="lock">Mõõdud lukus · 1:1</span>
+  <button slot="ar-button" class="ar-btn">Vaata oma krundil</button>
+  <div class="ar-bar">
+    <div class="row" data-bind="facadeColor" data-compact></div>
+    <div class="row" data-bind="roofColor" data-compact></div>
+  </div>
+</model-viewer>
+
+<div class="panel">
+  <div class="group"><div class="label">Fassaadi materjal <b id="lbl-facadeMat"></b></div><div class="row" data-bind="facadeMat"></div></div>
+  <div class="group">
+    <div class="label">Fassaadi värv <b id="lbl-facadeColor"></b></div>
+    <div class="row" data-bind="facadeColor"></div>
+    <label class="custom"><input type="color" data-custom="facadeColor"><input type="text" maxlength="7" data-custom-hex="facadeColor" placeholder="#2C3243"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Katusekate <b id="lbl-roofMat"></b></div><div class="row" data-bind="roofMat"></div></div>
+  <div class="group">
+    <div class="label">Katuse värv <b id="lbl-roofColor"></b></div>
+    <div class="row" data-bind="roofColor"></div>
+    <label class="custom"><input type="color" data-custom="roofColor"><input type="text" maxlength="7" data-custom-hex="roofColor" placeholder="#2B313C"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group">
+    <div class="label">Aknaraamid <b id="lbl-frame"></b></div>
+    <div class="row" data-bind="frame"></div>
+    <label class="custom"><input type="color" data-custom="frame"><input type="text" maxlength="7" data-custom-hex="frame" placeholder="#F2F0EA"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Aknaruudud <b id="lbl-muntins"></b></div><div class="row" data-bind="muntins"></div></div>
+  <div class="group">
+    <div class="label">Välisuks <b id="lbl-door"></b></div>
+    <div class="row" data-bind="door"></div>
+    <label class="custom"><input type="color" data-custom="door"><input type="text" maxlength="7" data-custom-hex="door" placeholder="#8A6A4C"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Otsalauad <b id="lbl-fascia"></b></div><div class="row" data-bind="fascia"></div></div>
+  <div class="group">
+    <div class="label">Terrassilaud <b id="lbl-deck"></b></div>
+    <div class="row" data-bind="deck"></div>
+    <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C4A07C"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Lisad</div><div class="row" id="extras"></div></div>
+  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. Androidis (Chrome) saab värve vahetada otse AR-vaates; iPhone'is vali enne ja vajuta siis „Vaata oma krundil“.</p>
+</div>
+
+<script type="module">
+const OPTIONS = {
+  facadeMat: [
+    { id:'boards_v', name:'Laudis, vertikaalne', tex:'boards_v' },
+    { id:'boards_h', name:'Laudis, horisontaalne', tex:'boards_h' },
+    { id:'plaster',  name:'Krohv', tex:'plaster' },
+  ],
+  facadeColor: [
+    { id:'tormisinine', name:'Tormisinine', hex:'#2C3243' },
+    { id:'grafiit',  name:'Grafiit', hex:'#3A3D42' },
+    { id:'sysimust', name:'Süsimust', hex:'#1F2023' },
+    { id:'metsaroheline', name:'Metsaroheline', hex:'#3D4A3E' },
+    { id:'sinihall', name:'Sinakashall', hex:'#5E6B78' },
+    { id:'graniit',  name:'Graniithall', hex:'#8C8F8E' },
+    { id:'liivakivi', name:'Liivakivi', hex:'#CFC6B4' },
+    { id:'kriit',    name:'Kriit', hex:'#E4E0D6' },
+    { id:'lumivalge', name:'Lumivalge', hex:'#F2F0EA' },
+    { id:'punamuld', name:'Punamuld', hex:'#7A2E22' },
+    { id:'ooker',    name:'Ooker', hex:'#B98A3E' },
+    { id:'puit',     name:'Naturaalne puit', hex:'#A87A4C' },
+  ],
+  roofMat: [
+    { id:'sindel', name:'Bituumensindel', tex:'shingle', rough:0.85, metal:0 },
+    { id:'valts', name:'Valtsplekk', tex:'seam', rough:0.38, metal:0.35 },
+    { id:'profiil', name:'Kivikattepleki profiil', tex:'metaltile', rough:0.35, metal:0.35 },
+    { id:'betoon', name:'Betoonkivi', tex:'tile', rough:0.85, metal:0 },
+    { id:'savi', name:'Savikivi', tex:'claytile', rough:0.75, metal:0 },
+    { id:'laast', name:'Puitlaast', tex:'woodshingle', rough:0.9, metal:0 },
+  ],
+  roofColor: [
+    { id:'tumesinine', name:'Tumesinine', hex:'#2B313C' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#2E3136' },
+    { id:'tumehall', name:'Tumehall', hex:'#43474D' },
+    { id:'hall', name:'Hall', hex:'#6E7277' },
+    { id:'hobe', name:'Hõbe', hex:'#A7AAAD' },
+    { id:'tumepruun', name:'Tumepruun', hex:'#3E2F27' },
+    { id:'punane', name:'Punane', hex:'#8E3B2A' },
+    { id:'telliskivi', name:'Telliskivi', hex:'#A0522D' },
+    { id:'roheline', name:'Tumeroheline', hex:'#2F3D33' },
+    { id:'laast', name:'Naturaalne laast', hex:'#9C7B57' },
+  ],
+  frame: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'kreem', name:'Kreemjas', hex:'#E8E0CF' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'tumehall', name:'Tumehall', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'pruun', name:'Pruun', hex:'#5A4232' },
+  ],
+  muntins: [ { id:'jah', name:'Ruutudega' }, { id:'ei', name:'Ilma ruutudeta' } ],
+  fascia: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'tume', name:'Tume', hex:'#2A2D31' },
+  ],
+  door: [
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+    { id:'pahkel', name:'Pähkel', hex:'#5A4232' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'punane', name:'Punane', hex:'#7A2E22' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+  ],
+  deck: [
+    { id:'lehis', name:'Lehis', hex:'#C4A07C' },
+    { id:'kuldne', name:'Kuldne mänd', hex:'#C9A36C' },
+    { id:'hallpuit', name:'Hallikas puit', hex:'#9C978D' },
+    { id:'pahkel', name:'Pähkel', hex:'#6B4E36' },
+    { id:'komposiit', name:'Grafiit komposiit', hex:'#55534F' },
+  ],
+};
+const SWATCH_GROUPS = ['facadeColor', 'roofColor'];
+const EXTRAS = [ { id:'carport', name:'Autovarjualune' }, { id:'panels', name:'Terrassi ribiseinad' } ];
+const state = { facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge',
+                muntins:'jah', fascia:'valge', door:'tamm', deck:'lehis', custom:{}, carport:false, panels:false };
+
+const mv = document.getElementById('mv');
+let cache = {};
+const tex = name => cache[name] ??= mv.createTexture(window.__TEX ? window.__TEX[name] : `tex/${name}.png`);
+const mat = name => mv.model?.getMaterialByName(name);
+const find = (k, id) => OPTIONS[k].find(o => o.id === id);
+const colourOf = k => state.custom[k] ?? find(k, state[k]).hex ?? (k === 'facadeColor' ? '#2C3243' : colourOf('facadeColor'));
+const glbName = () => `teder_c${+state.carport}_p${+state.panels}_m${state.muntins === 'jah' ? 1 : 0}`;
+const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb`;
+
+async function setTex(m, base, normal = true) {
+  if (!m) return;
+  m.pbrMetallicRoughness.baseColorTexture.setTexture(await tex(base));
+  if (normal && m.normalTexture) m.normalTexture.setTexture(await tex(base + '_n'));
+}
+const col = (name, hex) => mat(name)?.pbrMetallicRoughness.setBaseColorFactor(hex);
+
+async function apply() {
+  if (!mv.model) return;
+  const fm = find('facadeMat', state.facadeMat), rm = find('roofMat', state.roofMat);
+  await setTex(mat('wall'), fm.tex);
+  col('wall', colourOf('facadeColor'));
+  await setTex(mat('roof'), rm.tex);
+  col('roof', colourOf('roofColor'));
+  mat('roof').pbrMetallicRoughness.setRoughnessFactor(rm.rough);
+  mat('roof').pbrMetallicRoughness.setMetallicFactor(rm.metal);
+  await setTex(mat('soffit'), 'boards_h');
+  await setTex(mat('deck'), 'deck');
+  await setTex(mat('curtain'), 'curtain', false);
+  col('frame', colourOf('frame'));
+  col('fascia', find('fascia', state.fascia).hex ?? colourOf('facadeColor'));
+  col('deck', colourOf('deck'));
+  col('door', state.custom.door ?? find('door', state.door).hex ?? colourOf('facadeColor'));
+  render();
+}
+
+function setModel() {
+  const n = glbName();
+  if (mv.dataset.glb !== n) { mv.dataset.glb = n; mv.src = glbUrl(n); }
+  else apply();
+}
+
+function render() {
+  document.querySelectorAll('[data-bind]').forEach(row => {
+    const k = row.dataset.bind;
+    row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', !state.custom[k] && b.dataset.id === state[k]));
+    const lbl = document.getElementById('lbl-' + k);
+    if (lbl) lbl.textContent = state.custom[k] ?? find(k, state[k]).name;
+  });
+  document.querySelectorAll('#extras button').forEach(b => b.setAttribute('aria-pressed', state[b.dataset.id]));
+  document.querySelectorAll('[data-custom]').forEach(i => { i.value = colourOf(i.dataset.custom).toLowerCase(); });
+  document.querySelectorAll('[data-custom-hex]').forEach(i => { if (document.activeElement !== i) i.value = colourOf(i.dataset.customHex); });
+}
+
+document.querySelectorAll('[data-bind]').forEach(row => {
+  const k = row.dataset.bind, compact = row.hasAttribute('data-compact');
+  for (const o of OPTIONS[k]) {
+    const b = document.createElement('button');
+    b.dataset.id = o.id; b.title = o.name; b.setAttribute('aria-label', o.name);
+    if (SWATCH_GROUPS.includes(k)) { b.className = 'sw'; b.style.background = o.hex; }
+    else {
+      b.className = 'chip';
+      const dot = 'hex' in o ? `<span class="dot" style="background:${o.hex ?? 'linear-gradient(135deg,#fff 50%,#2C3243 50%)'}"></span>` : '';
+      b.innerHTML = dot + (compact ? o.name.split(' ').slice(-1)[0] : o.name);
+    }
+    b.addEventListener('click', e => {
+      e.stopPropagation(); state[k] = o.id; delete state.custom[k];
+      k === 'muntins' ? setModel() : apply();
+    });
+    row.appendChild(b);
+  }
+});
+for (const x of EXTRAS) {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.dataset.id = x.id; b.textContent = '+ ' + x.name;
+  b.addEventListener('click', () => { state[x.id] = !state[x.id]; b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name; setModel(); });
+  document.getElementById('extras').appendChild(b);
+}
+
+const valid = h => /^#[0-9a-fA-F]{6}$/.test(h);
+document.querySelectorAll('[data-custom]').forEach(i => i.addEventListener('input', e => {
+  state.custom[i.dataset.custom] = e.target.value.toUpperCase(); apply();
+}));
+document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('input', e => {
+  let v = e.target.value.trim(); if (!v.startsWith('#')) v = '#' + v;
+  if (valid(v)) { state.custom[i.dataset.customHex] = v.toUpperCase(); apply(); }
+}));
+
+mv.addEventListener('load', () => { cache = {}; apply(); });
+setModel();
+render();
+</script>
+</body>
+</html>

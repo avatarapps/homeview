@@ -16,7 +16,7 @@
   model-viewer { width:100%; height:60vh; min-height:360px; background:linear-gradient(#cfdbe6 0%,#e9edf0 55%,#e4e2dc 100%); }
   .ar-btn { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); border:0; border-radius:24px;
             background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:12px 20px; box-shadow:0 4px 14px rgba(0,0,0,.25); }
-  .lock { position:absolute; top:10px; left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
+  .lock { position:absolute; top:72px; left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
   .ar-bar { display:none; position:absolute; left:8px; right:8px; bottom:16px; gap:8px; flex-direction:column;
             background:rgba(255,255,255,.9); border-radius:16px; padding:10px; backdrop-filter:blur(6px); }
   model-viewer[ar-status="session-started"] .ar-bar { display:flex; }
@@ -52,9 +52,14 @@
   .ar-alt a { color:var(--ink); }
   .is-ios .ar-alt { display:block; }
   .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
-  /* keep the house in view while choosing */
-  model-viewer { position:sticky; top:0; z-index:5; height:44vh; min-height:300px; }
-  @media (min-width: 900px) { model-viewer { height:58vh; } .panel, .quote { max-width:900px; } }
+  /* house stays fixed at the top; the options scroll up over it on a see-through sheet */
+  model-viewer { position:fixed; top:0; left:0; right:0; width:100%; height:62vh; min-height:320px; z-index:0; }
+  header { position:relative; z-index:2; background:rgba(246,245,242,.72); }
+  .spacer { height:calc(62vh - 62px); min-height:258px; pointer-events:none; }
+  .ar-alt, .panel, .quote { position:relative; z-index:1; background:rgba(246,245,242,.68); }
+  .panel { max-width:none; } .panel > * { max-width:900px; }
+  .quote { max-width:none; border-top:1px solid rgba(0,0,0,.08); }
+  @media (min-width: 900px) { model-viewer { height:66vh; } .spacer { height:calc(66vh - 62px); } }
 </style>
 </head>
 <body>
@@ -76,6 +81,7 @@
     <div class="row" data-bind="roofColor" data-compact></div>
   </div>
 </model-viewer>
+<div class="spacer"></div>
 
 <div class="ar-alt">Tahad AR-is värve järjest proovida? <a rel="ar" href="teder_ar.usdz" id="ar-palette"><img alt="" width="1" height="1" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">Ava värvipaneeliga AR</a> (8 fassaaditooni ja 4 katust otse AR-vaates).</div>
 <div class="panel">

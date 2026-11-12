@@ -72,6 +72,15 @@
     .sw[aria-pressed="true"]:hover { box-shadow:0 0 0 2px var(--ink); }
     .primary:hover { background:#34373c; }
   }
+  .house-nav { position:absolute; bottom:18px; z-index:3; display:flex; align-items:center; gap:8px; padding:9px 16px; border-radius:24px;
+    border:1px solid rgba(255,255,255,.75); background:rgba(255,255,255,.42); color:#1d1f22; font:600 14px/1 inherit; cursor:pointer;
+    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.08); transition:background .2s, transform .2s; }
+  .house-nav.prev { left:16px; } .house-nav.next { right:16px; }
+  .house-nav .arr { font-size:22px; line-height:14px; font-weight:400; }
+  .house-nav:hover { background:rgba(255,255,255,.75); transform:translateY(-1px); }
+  model-viewer[ar-status="session-started"] .house-nav { display:none; }
+  body.scrolled .house-nav { opacity:0; pointer-events:none; }
+  .house-nav { transition:background .2s, transform .2s, opacity .25s; }
   .qr-card { display:none; }
   @media (min-width: 1240px) and (hover: hover) {
     .qr-card { display:block; position:absolute; top:22px; right:40px; width:260px; padding:20px 20px 18px; background:rgba(246,245,242,.55);
@@ -95,6 +104,8 @@
   tone-mapping="aces" exposure="0.95"
   camera-orbit="-25deg 74deg 30m" field-of-view="32deg" camera-target="0m 2m -7m" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
   interaction-prompt="none">
+  <button class="house-nav prev" type="button" id="nav-prev" aria-label="Eelmine maja"><span class="arr">‹</span><span class="nm"></span></button>
+  <button class="house-nav next" type="button" id="nav-next" aria-label="Järgmine maja"><span class="nm"></span><span class="arr">›</span></button>
   <span class="lock">Mõõdud lukus · 1:1</span>
   <button slot="ar-button" class="ar-btn">Vaata oma krundil</button>
   <div class="ar-bar">
@@ -250,6 +261,23 @@ const OPTIONS = {
     { id:'komposiit', name:'Grafiit komposiit', hex:'#55534F' },
   ],
 };
+const HOUSES = [
+  { id:'teder', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
+    cam:{ '187':[27,-6.5], '224':[30,-7], '270':[36,-8.5] },
+    defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', deck:'lehis' } },
+  { id:'oobik', name:'Ööbik', extras:[],
+    sizes:[ { id:'129', name:'Bruto 128,7 m² · neto 101,7 m²', short:'129', brutto:'128,7', netto:'101,7' } ],
+    cam:{ '129':[27,-7.9,40] },
+    defaults:{ size:'129', facadeMat:'boards_h', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'grafiit', deck:'lehis' } },
+  { id:'hiireviu', name:'Hiireviu', extras:[],
+    sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
+    cam:{ '161':[27,-7.8,35] },
+    defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'grafiit', frame:'valge', muntins:'jah', fascia:'tume', door:'must', deck:'lehis' } },
+];
+let house = HOUSES[0];
+let pendingCam = null;
+const saved = {};
+let touched = new Set();
 const SWATCH_GROUPS = ['facadeColor', 'roofColor'];
 const EXTRAS = [ { id:'carport', name:'Autovarjualune' }, { id:'panels', name:'Terrassi ribiseinad' } ];
 const state = { size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge',
@@ -261,8 +289,9 @@ const tex = name => cache[name] ??= mv.createTexture(window.__TEX ? window.__TEX
 const mat = name => mv.model?.getMaterialByName(name);
 const find = (k, id) => OPTIONS[k].find(o => o.id === id);
 const colourOf = k => state.custom[k] ?? find(k, state[k]).hex ?? (k === 'facadeColor' ? '#2C3243' : colourOf('facadeColor'));
-const hasCarport = () => state.carport && state.size !== '270';
-const glbName = () => `teder${state.size}_c${+hasCarport()}_p${+state.panels}_m${state.muntins === 'jah' ? 1 : 0}`;
+const hasCarport = () => house.extras.includes('carport') && state.carport && state.size !== '270';
+const hasPanels = () => house.extras.includes('panels') && state.panels;
+const glbName = () => `${house.id}${state.size}_c${+hasCarport()}_p${+hasPanels()}_m${state.muntins === 'jah' ? 1 : 0}`;
 const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb`;
 
 async function setTex(m, base, normal = true) {
@@ -294,7 +323,8 @@ async function apply() {
 function setModel() {
   const n = glbName();
   if (mv.dataset.glb !== n) {
-    if (mv.dataset.size !== state.size) { mv.dataset.size = state.size; mv.cameraOrbit = `-25deg 74deg ${{'187': 27, '224': 30, '270': 36}[state.size]}m`; mv.cameraTarget = `0m 2m ${{'187': -6.5, '224': -7, '270': -8.5}[state.size]}m`; }
+    const camKey = house.id + state.size;
+    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d, tz, az = -25] = house.cam[state.size]; pendingCam = [`${az}deg 74deg ${d}m`, `0m 2m ${tz}m`]; }
     mv.dataset.glb = n; mv.src = glbUrl(n);
   }
   else apply();
@@ -312,8 +342,9 @@ function render() {
   document.querySelectorAll('[data-custom-hex]').forEach(i => { if (document.activeElement !== i) i.value = colourOf(i.dataset.customHex); });
 }
 
-document.querySelectorAll('[data-bind]').forEach(row => {
+function buildRow(row) {
   const k = row.dataset.bind, compact = row.hasAttribute('data-compact');
+  row.innerHTML = '';
   for (const o of OPTIONS[k]) {
     const b = document.createElement('button');
     b.dataset.id = o.id; b.title = o.name; b.setAttribute('aria-label', o.name);
@@ -324,30 +355,35 @@ document.querySelectorAll('[data-bind]').forEach(row => {
       b.innerHTML = dot + (compact ? o.name.split(' ').slice(-1)[0] : o.name);
     }
     b.addEventListener('click', e => {
-      e.stopPropagation(); state[k] = o.id; delete state.custom[k];
+      e.stopPropagation(); state[k] = o.id; delete state.custom[k]; if (k !== 'size') touched.add(k);
       (k === 'muntins' || k === 'size') ? setModel() : apply();
     });
     row.appendChild(b);
   }
-});
+}
+document.querySelectorAll('[data-bind]').forEach(buildRow);
 for (const x of EXTRAS) {
   const b = document.createElement('button');
   b.className = 'chip'; b.dataset.id = x.id; b.textContent = '+ ' + x.name;
-  b.addEventListener('click', () => { state[x.id] = !state[x.id]; b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name; setModel(); });
+  b.addEventListener('click', () => { state[x.id] = !state[x.id]; setModel(); });
   document.getElementById('extras').appendChild(b);
 }
 
 const valid = h => /^#[0-9a-fA-F]{6}$/.test(h);
 document.querySelectorAll('[data-custom]').forEach(i => i.addEventListener('input', e => {
-  state.custom[i.dataset.custom] = e.target.value.toUpperCase(); apply();
+  state.custom[i.dataset.custom] = e.target.value.toUpperCase(); touched.add(i.dataset.custom); apply();
 }));
 document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('input', e => {
   let v = e.target.value.trim(); if (!v.startsWith('#')) v = '#' + v;
-  if (valid(v)) { state.custom[i.dataset.customHex] = v.toUpperCase(); apply(); }
+  if (valid(v)) { state.custom[i.dataset.customHex] = v.toUpperCase(); touched.add(i.dataset.customHex); apply(); }
 }));
 
 mv.environmentImage = window.__SKY_URL ?? 'sky.hdr';
-mv.addEventListener('load', () => { cache = {}; apply(); });
+mv.addEventListener('load', () => {
+  cache = {};
+  if (pendingCam) { mv.cameraOrbit = pendingCam[0]; mv.cameraTarget = pendingCam[1]; mv.jumpCameraToGoal(); pendingCam = null; }
+  apply();
+});
 // ---- persistence: URL hash + localStorage -------------------------------------
 function updateQR() {
   const box = document.getElementById('qr'); if (!box || typeof qrcode === 'undefined') return;
@@ -373,30 +409,70 @@ function loadState(s) {
     return true;
   } catch { return false; }
 }
+const hIdx = () => HOUSES.indexOf(house);
+const snapshot = () => JSON.parse(JSON.stringify(state));
 function persist() {
   const enc = encodeState();
-  try { localStorage.setItem('teder-cfg', enc); } catch {}
-  try { history.replaceState(null, '', location.pathname + location.search + '#c' + enc); } catch {}
+  saved[house.id] = snapshot();
+  try {
+    localStorage.setItem('hv-house', house.id);
+    localStorage.setItem('hv-saved', JSON.stringify(saved));
+    localStorage.setItem('hv-touched', JSON.stringify([...touched]));
+  } catch {}
+  try { history.replaceState(null, '', location.pathname + location.search + '#h' + hIdx() + enc); } catch {}
   updateQR();
 }
-const fromHash = location.hash.startsWith('#c') && loadState(location.hash.slice(2));
-if (!fromHash) { try { const s = localStorage.getItem('teder-cfg'); if (s) loadState(s); } catch {} }
-document.querySelectorAll('#extras button').forEach(b => {
-  const x = EXTRAS.find(e => e.id === b.dataset.id); b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
-});
+function useHouse(h) {
+  house = h; OPTIONS.size = h.sizes;
+  buildRow(document.querySelector('.panel [data-bind="size"]'));
+}
+function switchHouse(dir) {
+  saved[house.id] = snapshot();
+  const prevState = snapshot();
+  const next = HOUSES[(hIdx() + dir + HOUSES.length) % HOUSES.length];
+  useHouse(next);
+  for (const k of Object.keys(state)) if (!['custom'].includes(k)) delete state[k];
+  if (saved[next.id]) Object.assign(state, saved[next.id]);
+  else {
+    // first visit: start from this house's own look, carry over what the visitor has chosen themselves
+    Object.assign(state, next.defaults, { custom:{}, carport:false, panels:false });
+    for (const k of touched) {
+      if (prevState.custom[k]) state.custom[k] = prevState.custom[k];
+      else if (OPTIONS[k] && OPTIONS[k].some(o => o.id === prevState[k])) state[k] = prevState[k];
+    }
+  }
+  setModel(); render();
+}
+document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropagation(); switchHouse(-1); });
+document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
+try { Object.assign(saved, JSON.parse(localStorage.getItem('hv-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv-touched') || '[]')); } catch {}
+let fromHash = false;
+if (location.hash.startsWith('#h')) {
+  const h = HOUSES[parseInt(location.hash[2], 10)];
+  if (h) { useHouse(h); fromHash = loadState(location.hash.slice(3)); }
+} else if (location.hash.startsWith('#c')) {
+  fromHash = loadState(location.hash.slice(2));            // older Teder-only links
+}
+if (!fromHash) {
+  let id = null; try { id = localStorage.getItem('hv-house'); } catch {}
+  const h = HOUSES.find(x => x.id === id);
+  if (h) { useHouse(h); if (saved[h.id]) Object.assign(state, saved[h.id]); }
+}
+if (!OPTIONS.size.some(o => o.id === state.size)) Object.assign(state, house.defaults);
+
 
 // ---- summary -------------------------------------------------------------------
 const LABELS = [['facadeMat','Fassaadi materjal'],['facadeColor','Fassaadi värv'],['roofMat','Katusekate'],['roofColor','Katuse värv'],
   ['frame','Aknaraamid'],['muntins','Aknaruudud'],['door','Välisuks'],['fascia','Otsalauad'],['deck','Terrassilaud']];
 function summaryRows() {
   const sz = find('size', state.size);
-  const rows = [['Maja', `Teder ${sz.short} m² – brutopind ${sz.brutto} m², netopind ${sz.netto} m²${sz.id === '270' ? ', garaažiga' : ''}`]];
+  const rows = [['Maja', `${house.name} ${sz.short} m² – brutopind ${sz.brutto} m², netopind ${sz.netto} m²${house.id === 'teder' && sz.id === '270' ? ', garaažiga' : ''}`]];
   for (const [k, l] of LABELS) {
     const o = find(k, state[k]);
     const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));
     rows.push([l, v]);
   }
-  rows.push(['Lisad', [hasCarport() && 'autovarjualune', state.panels && 'terrassi ribiseinad'].filter(Boolean).join(', ') || 'ei']);
+  if (house.extras.length) rows.push(['Lisad', [hasCarport() && 'autovarjualune', hasPanels() && 'terrassi ribiseinad'].filter(Boolean).join(', ') || 'ei']);
   return rows;
 }
 function renderSummary() {
@@ -406,13 +482,24 @@ const _render = render;
 render = function () {
   _render(); renderSummary(); persist();
   const sz = find('size', state.size);
-  document.querySelector('h1').textContent = `Teder ${sz.short} m² – proovi oma krundil`;
-  const pal = document.getElementById('ar-palette'); if (pal) pal.href = `teder${state.size}_ar.usdz`;
-  const cp = document.querySelector('#extras button[data-id="carport"]'); if (cp) cp.style.display = state.size === '270' ? 'none' : '';
+  document.querySelector('h1').textContent = `${house.name} ${sz.short} m² – proovi oma krundil`;
+  document.title = `${house.name} ${sz.short} m² – proovi oma krundil`;
+  document.querySelector('.sub').textContent = `Ligikaudne mudel Soome Maja avaliku plaani põhjal · privaatne demo`;
+  const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz`;
+  const ex = document.getElementById('extras');
+  ex.closest('.group').style.display = house.extras.length ? '' : 'none';
+  ex.querySelectorAll('button').forEach(b => {
+    const x = EXTRAS.find(e => e.id === b.dataset.id);
+    b.style.display = house.extras.includes(x.id) && !(x.id === 'carport' && state.size === '270') ? '' : 'none';
+    b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
+  });
+  const n = HOUSES.length, i = hIdx();
+  document.querySelector('#nav-prev .nm').textContent = HOUSES[(i - 1 + n) % n].name;
+  document.querySelector('#nav-next .nm').textContent = HOUSES[(i + 1) % n].name;
 };
 
 const PUBLIC_URL = 'https://avatarapps.github.io/homeview/i0k9g95har/';
-const configLink = () => PUBLIC_URL + '#c' + encodeState();
+const configLink = () => PUBLIC_URL + '#h' + hIdx() + encodeState();
 document.getElementById('copy-link').addEventListener('click', async () => {
   const msg = document.getElementById('link-msg');
   try { await navigator.clipboard.writeText(configLink()); msg.textContent = 'Link kopeeritud – see avab täpselt selle valiku.'; }
@@ -429,7 +516,7 @@ fileInput.addEventListener('change', () => {
 document.getElementById('qform').addEventListener('submit', async e => {
   e.preventDefault();
   const f = new FormData(e.target), msg = document.getElementById('qmsg');
-  const lines = [`Päring: Teder ${find('size', state.size).short} m²`, '',
+  const lines = [`Päring: ${house.name} ${find('size', state.size).short} m²`, '',
     ...summaryRows().map(([a, b]) => `${a}: ${b}`), '',
     `Nimi: ${f.get('nimi')}`, `E-post: ${f.get('email')}`, f.get('tel') ? `Telefon: ${f.get('tel')}` : null,
     `Krunt: ${f.get('krunt') || '-'}`, `Valmidusaste: ${f.get('valmidus')}`, `Ehitusaeg: ${f.get('aeg')}`,
@@ -437,14 +524,15 @@ document.getElementById('qform').addEventListener('submit', async e => {
   const text = lines.join('\n');
   const files = [...fileInput.files];
   if (navigator.canShare && navigator.canShare({ files, text })) {
-    try { await navigator.share({ title: `Päring: Teder ${find('size', state.size).short} m²`, text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
+    try { await navigator.share({ title: `Päring: ${house.name} ${find('size', state.size).short} m²`, text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
     catch (err) { if (err.name === 'AbortError') return; }
   }
-  location.href = 'mailto:?subject=' + encodeURIComponent(`Päring: Teder ${find('size', state.size).short} m²`) + '&body=' + encodeURIComponent(text);
+  location.href = 'mailto:?subject=' + encodeURIComponent(`Päring: ${house.name} ${find('size', state.size).short} m²`) + '&body=' + encodeURIComponent(text);
   msg.textContent = files.length ? 'E-post avanes valikutega – lisa pildid kirjale manusena.' : 'E-post avanes valikutega.';
 });
 
 if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');
+addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive:true });
 setModel();
 render();
 </script>

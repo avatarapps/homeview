@@ -67,7 +67,7 @@
   ar ar-modes="webxr quick-look scene-viewer" ar-scale="fixed" ar-placement="floor"
   camera-controls touch-action="pan-y" shadow-intensity="1" shadow-softness="0.35"
   tone-mapping="aces" exposure="0.95"
-  camera-orbit="-25deg 72deg auto" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
+  camera-orbit="-25deg 74deg 30m" field-of-view="32deg" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
   interaction-prompt="none">
   <span class="lock">Mõõdud lukus · 1:1</span>
   <button slot="ar-button" class="ar-btn">Vaata oma krundil</button>
@@ -261,7 +261,10 @@ async function apply() {
 
 function setModel() {
   const n = glbName();
-  if (mv.dataset.glb !== n) { mv.dataset.glb = n; mv.src = glbUrl(n); }
+  if (mv.dataset.glb !== n) {
+    if (mv.dataset.size !== state.size) { mv.dataset.size = state.size; mv.cameraOrbit = `-25deg 74deg ${{'187': 27, '224': 30, '270': 36}[state.size]}m`; }
+    mv.dataset.glb = n; mv.src = glbUrl(n);
+  }
   else apply();
 }
 

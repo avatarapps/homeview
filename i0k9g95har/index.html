@@ -54,14 +54,7 @@
   .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
   /* keep the house in view while choosing */
   model-viewer { position:sticky; top:0; z-index:5; height:44vh; min-height:300px; }
-  @media (min-width: 900px) {
-    body { display:grid; grid-template-columns:minmax(0,1fr) 460px; grid-template-rows:auto auto auto 1fr; }
-    header { grid-column:1 / -1; }
-    model-viewer { grid-column:1; grid-row:2 / span 3; height:calc(100vh - 0px); align-self:start; }
-    .ar-alt, .panel, .quote { grid-column:2; }
-    .panel { padding-top:10px; }
-    .quote { border-top:1px solid var(--line); }
-  }
+  @media (min-width: 900px) { model-viewer { height:58vh; } .panel, .quote { max-width:900px; } }
 </style>
 </head>
 <body>
@@ -150,9 +143,9 @@
 <script type="module">
 const OPTIONS = {
   size: [
-    { id:'187', name:'187 m²', brutto:'187,0', netto:'149,0' },
-    { id:'224', name:'224 m²', brutto:'223,9', netto:'184,1' },
-    { id:'270', name:'270 m² (garaažiga)', brutto:'270,4', netto:'225,3' },
+    { id:'187', name:'Bruto 187,0 m² · neto 149,0 m²', short:'187', brutto:'187,0', netto:'149,0' },
+    { id:'224', name:'Bruto 223,9 m² · neto 184,1 m²', short:'224', brutto:'223,9', netto:'184,1' },
+    { id:'270', name:'Bruto 270,4 m² · neto 225,3 m² · garaažiga', short:'270', brutto:'270,4', netto:'225,3' },
   ],
   facadeMat: [
     { id:'boards_v', name:'Laudis, vertikaalne', tex:'boards_v' },
@@ -346,7 +339,7 @@ const LABELS = [['facadeMat','Fassaadi materjal'],['facadeColor','Fassaadi värv
   ['frame','Aknaraamid'],['muntins','Aknaruudud'],['door','Välisuks'],['fascia','Otsalauad'],['deck','Terrassilaud']];
 function summaryRows() {
   const sz = find('size', state.size);
-  const rows = [['Maja', `Teder ${sz.name} (brutopind ${sz.brutto} m², netopind ${sz.netto} m²)`]];
+  const rows = [['Maja', `Teder ${sz.short} m² – brutopind ${sz.brutto} m², netopind ${sz.netto} m²${sz.id === '270' ? ', garaažiga' : ''}`]];
   for (const [k, l] of LABELS) {
     const o = find(k, state[k]);
     const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));
@@ -362,7 +355,7 @@ const _render = render;
 render = function () {
   _render(); renderSummary(); persist();
   const sz = find('size', state.size);
-  document.querySelector('h1').textContent = `Teder ${sz.name.split(' ')[0]} m² – proovi oma krundil`.replace('m² m²', 'm²');
+  document.querySelector('h1').textContent = `Teder ${sz.short} m² – proovi oma krundil`;
   const pal = document.getElementById('ar-palette'); if (pal) pal.href = `teder${state.size}_ar.usdz`;
   const cp = document.querySelector('#extras button[data-id="carport"]'); if (cp) cp.style.display = state.size === '270' ? 'none' : '';
 };
@@ -384,7 +377,7 @@ fileInput.addEventListener('change', () => {
 document.getElementById('qform').addEventListener('submit', async e => {
   e.preventDefault();
   const f = new FormData(e.target), msg = document.getElementById('qmsg');
-  const lines = [`Päring: Teder ${find('size', state.size).name}`, '',
+  const lines = [`Päring: Teder ${find('size', state.size).short} m²`, '',
     ...summaryRows().map(([a, b]) => `${a}: ${b}`), '',
     `Nimi: ${f.get('nimi')}`, `E-post: ${f.get('email')}`, f.get('tel') ? `Telefon: ${f.get('tel')}` : null,
     `Krunt: ${f.get('krunt') || '-'}`, `Valmidusaste: ${f.get('valmidus')}`, `Ehitusaeg: ${f.get('aeg')}`,
@@ -392,10 +385,10 @@ document.getElementById('qform').addEventListener('submit', async e => {
   const text = lines.join('\n');
   const files = [...fileInput.files];
   if (navigator.canShare && navigator.canShare({ files, text })) {
-    try { await navigator.share({ title: `Päring: Teder ${find('size', state.size).name}`, text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
+    try { await navigator.share({ title: `Päring: Teder ${find('size', state.size).short} m²`, text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
     catch (err) { if (err.name === 'AbortError') return; }
   }
-  location.href = 'mailto:?subject=' + encodeURIComponent(`Päring: Teder ${find('size', state.size).name}`) + '&body=' + encodeURIComponent(text);
+  location.href = 'mailto:?subject=' + encodeURIComponent(`Päring: Teder ${find('size', state.size).short} m²`) + '&body=' + encodeURIComponent(text);
   msg.textContent = files.length ? 'E-post avanes valikutega – lisa pildid kirjale manusena.' : 'E-post avanes valikutega.';
 });
 

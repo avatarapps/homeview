@@ -38,6 +38,20 @@
   .note { font-size:12.5px; color:var(--muted); padding-top:14px; }
   .ar-bar .sw { width:32px; height:32px; }
   .ar-bar .chip { padding:6px 10px; font-size:13px; }
+  .quote { padding:22px 16px 40px; max-width:900px; border-top:8px solid #ebe8e2; }
+  .quote h2 { font-size:19px; margin:0 0 4px; }
+  .quote form { display:grid; gap:12px; margin-top:14px; max-width:520px; }
+  .quote label { display:grid; gap:5px; font-size:13px; color:var(--muted); }
+  .quote input, .quote select, .quote textarea { font:inherit; color:var(--ink); padding:10px 11px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .primary { border:0; border-radius:24px; background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:13px 20px; cursor:pointer; }
+  .secondary { border:1px solid var(--ink); border-radius:24px; background:#fff; color:var(--ink); font-size:14px; font-weight:600; padding:10px 16px; cursor:pointer; }
+  #summary { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; margin:0 0 12px; font-size:14px; }
+  #summary dt { color:var(--muted); } #summary dd { margin:0; font-weight:550; }
+  #thumbs { display:flex; gap:8px; flex-wrap:wrap; } #thumbs img { width:84px; height:84px; object-fit:cover; border-radius:8px; }
+  .ar-alt { display:none; padding:10px 16px 0; font-size:13.5px; }
+  .ar-alt a { color:var(--ink); }
+  .is-ios .ar-alt { display:block; }
+  .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
 </style>
 </head>
 <body>
@@ -46,7 +60,7 @@
   <div class="sub">Ligikaudne mudel Soome Maja avaliku plaani põhjal · privaatne demo</div>
 </header>
 
-<model-viewer id="mv" ios-src="teder_ar.usdz" alt="Elementmaja Teder 3D-mudel"
+<model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
   ar ar-modes="webxr quick-look scene-viewer" ar-scale="fixed" ar-placement="floor"
   camera-controls touch-action="pan-y" shadow-intensity="1" shadow-softness="0.35"
   tone-mapping="aces" exposure="0.95"
@@ -60,6 +74,7 @@
   </div>
 </model-viewer>
 
+<div class="ar-alt">Tahad AR-is värve järjest proovida? <a rel="ar" href="teder_ar.usdz" id="ar-palette"><img alt="" width="1" height="1" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">Ava värvipaneeliga AR</a> (8 fassaaditooni ja 4 katust otse AR-vaates).</div>
 <div class="panel">
   <div class="group"><div class="label">Fassaadi materjal <b id="lbl-facadeMat"></b></div><div class="row" data-bind="facadeMat"></div></div>
   <div class="group">
@@ -91,8 +106,35 @@
     <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C79F76"><span>Oma värvikood</span></label>
   </div>
   <div class="group"><div class="label">Lisad</div><div class="row" id="extras"></div></div>
-  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. <b>iPhone:</b> AR-is on maja kõrval värvipaneel – ülemine rida vahetab fassaadi, alumine katust, hall ruut peidab paneeli. Puuduta maja, et paneel tagasi tuua. Raamid, uks, terrass ja lisad on iPhone'i AR-is vaikimisi valikutega. <b>Android:</b> kõik lehel tehtud valikud lähevad AR-i kaasa.</p>
+  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt (päästikunupp) ja lisa see allpool päringule.</p>
+  <div class="group">
+    <div class="label">Sinu valik</div>
+    <dl id="summary"></dl>
+    <div class="cta-bar">
+      <button class="primary" type="button" id="go-quote">Küsi pakkumist</button>
+      <button class="secondary" type="button" id="copy-link">Kopeeri link sellele valikule</button>
+    </div>
+    <div class="sub" id="link-msg"></div>
+  </div>
 </div>
+
+<section class="quote" id="pakkumine">
+  <h2>Küsi pakkumist</h2>
+  <div class="sub">Müüja saab kõik sinu valikud ja pildid majast sinu krundil. Kohtumist ei pea kokku leppima.</div>
+  <form id="qform">
+    <label>Nimi<input name="nimi" required autocomplete="name"></label>
+    <label>E-post<input name="email" type="email" required autocomplete="email"></label>
+    <label>Telefon (soovi korral)<input name="tel" type="tel" autocomplete="tel"></label>
+    <label>Krundi asukoht<input name="krunt" placeholder="aadress või katastritunnus"></label>
+    <label>Valmidusaste<select name="valmidus"><option>Tehasepakett</option><option>Valge karp</option><option>Võtmed kätte</option><option>Ei tea veel</option></select></label>
+    <label>Millal soovid ehitada?<select name="aeg"><option>0–6 kuu jooksul</option><option>6–12 kuu jooksul</option><option>1–2 aasta jooksul</option><option>Uurin alles</option></select></label>
+    <label>Pildid krundilt (AR-pildid galeriist)<input name="pildid" type="file" accept="image/*" multiple></label>
+    <div id="thumbs"></div>
+    <label>Lisainfo<textarea name="info" rows="3" placeholder="nt soovin saunat, laiemat terrassi …"></textarea></label>
+    <button class="primary" type="submit">Saada päring</button>
+    <div class="sub" id="qmsg"></div>
+  </form>
+</section>
 
 <script type="module">
 const OPTIONS = {
@@ -261,6 +303,79 @@ document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('
 
 mv.environmentImage = window.__SKY_URL ?? 'sky.hdr';
 mv.addEventListener('load', () => { cache = {}; apply(); });
+// ---- persistence: URL hash + localStorage -------------------------------------
+const KEYS = ['facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck','carport','panels'];
+function encodeState() {
+  const o = {}; KEYS.forEach(k => o[k] = state[k]); o.custom = state.custom;
+  return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/, '');
+}
+function loadState(s) {
+  try { const o = JSON.parse(decodeURIComponent(escape(atob(s)))); KEYS.forEach(k => { if (k in o) state[k] = o[k]; }); state.custom = o.custom || {}; return true; }
+  catch { return false; }
+}
+function persist() {
+  const enc = encodeState();
+  try { localStorage.setItem('teder-config', enc); } catch {}
+  try { history.replaceState(null, '', location.pathname + location.search + '#v' + enc); } catch {}
+}
+const fromHash = location.hash.startsWith('#v') && loadState(location.hash.slice(2));
+if (!fromHash) { try { const s = localStorage.getItem('teder-config'); if (s) loadState(s); } catch {} }
+document.querySelectorAll('#extras button').forEach(b => {
+  const x = EXTRAS.find(e => e.id === b.dataset.id); b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
+});
+
+// ---- summary -------------------------------------------------------------------
+const LABELS = [['facadeMat','Fassaadi materjal'],['facadeColor','Fassaadi värv'],['roofMat','Katusekate'],['roofColor','Katuse värv'],
+  ['frame','Aknaraamid'],['muntins','Aknaruudud'],['door','Välisuks'],['fascia','Otsalauad'],['deck','Terrassilaud']];
+function summaryRows() {
+  const rows = [['Maja','Teder 224 m² (brutopind 223,9 m²)']];
+  for (const [k, l] of LABELS) {
+    const o = find(k, state[k]);
+    const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));
+    rows.push([l, v]);
+  }
+  rows.push(['Lisad', [state.carport && 'autovarjualune', state.panels && 'terrassi ribiseinad'].filter(Boolean).join(', ') || 'ei']);
+  return rows;
+}
+function renderSummary() {
+  document.getElementById('summary').innerHTML = summaryRows().map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
+}
+const _render = render;
+render = function () { _render(); renderSummary(); persist(); };
+
+const configLink = () => location.origin + location.pathname + '#v' + encodeState();
+document.getElementById('copy-link').addEventListener('click', async () => {
+  const msg = document.getElementById('link-msg');
+  try { await navigator.clipboard.writeText(configLink()); msg.textContent = 'Link kopeeritud – see avab täpselt selle valiku.'; }
+  catch { msg.textContent = configLink(); }
+});
+document.getElementById('go-quote').addEventListener('click', () => document.getElementById('pakkumine').scrollIntoView({ behavior: 'smooth' }));
+
+// ---- quote request ---------------------------------------------------------------
+const fileInput = document.querySelector('#qform input[type=file]');
+fileInput.addEventListener('change', () => {
+  const t = document.getElementById('thumbs'); t.innerHTML = '';
+  [...fileInput.files].forEach(f => { const i = document.createElement('img'); i.src = URL.createObjectURL(f); t.appendChild(i); });
+});
+document.getElementById('qform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const f = new FormData(e.target), msg = document.getElementById('qmsg');
+  const lines = ['Päring: Teder 224 m²', '',
+    ...summaryRows().map(([a, b]) => `${a}: ${b}`), '',
+    `Nimi: ${f.get('nimi')}`, `E-post: ${f.get('email')}`, f.get('tel') ? `Telefon: ${f.get('tel')}` : null,
+    `Krunt: ${f.get('krunt') || '-'}`, `Valmidusaste: ${f.get('valmidus')}`, `Ehitusaeg: ${f.get('aeg')}`,
+    f.get('info') ? `Lisainfo: ${f.get('info')}` : null, '', `Konfiguratsioon 3D-s: ${configLink()}`].filter(l => l !== null);
+  const text = lines.join('\n');
+  const files = [...fileInput.files];
+  if (navigator.canShare && navigator.canShare({ files, text })) {
+    try { await navigator.share({ title: 'Päring: Teder 224 m²', text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
+    catch (err) { if (err.name === 'AbortError') return; }
+  }
+  location.href = 'mailto:?subject=' + encodeURIComponent('Päring: Teder 224 m²') + '&body=' + encodeURIComponent(text);
+  msg.textContent = files.length ? 'E-post avanes valikutega – lisa pildid kirjale manusena.' : 'E-post avanes valikutega.';
+});
+
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');
 setModel();
 render();
 </script>

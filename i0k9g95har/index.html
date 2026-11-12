@@ -60,7 +60,23 @@
   .panel { max-width:none; } .panel > * { max-width:900px; }
   .quote { max-width:none; border-top:1px solid rgba(0,0,0,.08); }
   @media (min-width: 900px) { model-viewer { height:66vh; } .spacer { height:calc(66vh - 62px); } }
+  @media (hover: hover) {
+    .chip, .secondary, .sw { transition:background-color .15s, box-shadow .15s, transform .15s; }
+    .chip:hover, .secondary:hover { background:#f6efe2; }
+    .sw:hover { transform:scale(1.08); box-shadow:0 0 0 3px #f1e6d2; }
+    .sw[aria-pressed="true"]:hover { box-shadow:0 0 0 2px var(--ink); }
+    .primary:hover { background:#34373c; }
+  }
+  .qr-card { display:none; }
+  @media (min-width: 1240px) and (hover: hover) {
+    .qr-card { display:block; position:absolute; top:22px; right:40px; width:260px; padding:20px 20px 18px; background:#fff;
+               border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.12); text-align:center; }
+    .qr-title { font-size:17px; font-weight:650; line-height:1.25; margin-bottom:14px; }
+    #qr { width:180px; height:180px; margin:0 auto; } #qr svg { width:100%; height:100%; display:block; }
+    .qr-sub { font-size:13px; color:var(--muted); margin-top:12px; line-height:1.35; }
+  }
 </style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 <header>
@@ -85,6 +101,11 @@
 
 <div class="ar-alt">Tahad AR-is värve järjest proovida? <a rel="ar" href="teder_ar.usdz" id="ar-palette"><img alt="" width="1" height="1" src="data:image/gif;base64,R0lGODlhAQABAAAAACw=">Ava värvipaneeliga AR</a> (8 fassaaditooni ja 4 katust otse AR-vaates).</div>
 <div class="panel">
+  <aside class="qr-card" aria-label="Vaata oma krundil">
+    <div class="qr-title">Vaata seda maja oma krundil</div>
+    <div id="qr"></div>
+    <div class="qr-sub">Skaneeri telefoniga – maja avaneb sinu valikutega päris suuruses.</div>
+  </aside>
   <div class="group"><div class="label">Maja suurus <b id="lbl-size"></b></div><div class="row" data-bind="size"></div></div>
   <div class="group"><div class="label">Fassaadi materjal <b id="lbl-facadeMat"></b></div><div class="row" data-bind="facadeMat"></div></div>
   <div class="group">
@@ -323,22 +344,38 @@ document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('
 mv.environmentImage = window.__SKY_URL ?? 'sky.hdr';
 mv.addEventListener('load', () => { cache = {}; apply(); });
 // ---- persistence: URL hash + localStorage -------------------------------------
+function updateQR() {
+  const box = document.getElementById('qr'); if (!box || typeof qrcode === 'undefined') return;
+  const q = qrcode(0, 'M'); q.addData(configLink()); q.make();
+  box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+}
 const KEYS = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck','carport','panels'];
+const ORDER = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck'];
 function encodeState() {
-  const o = {}; KEYS.forEach(k => o[k] = state[k]); o.custom = state.custom;
-  return btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/=+$/, '');
+  let s = ORDER.map(k => Math.max(0, OPTIONS[k].findIndex(o => o.id === state[k])).toString(36)).join('');
+  s += (state.carport ? 1 : 0) + '' + (state.panels ? 1 : 0);
+  for (const [k, hex] of Object.entries(state.custom || {})) { const i = ORDER.indexOf(k); if (i >= 0) s += '-' + i.toString(36) + hex.replace('#', ''); }
+  return s;
 }
 function loadState(s) {
-  try { const o = JSON.parse(decodeURIComponent(escape(atob(s)))); KEYS.forEach(k => { if (k in o) state[k] = o[k]; }); state.custom = o.custom || {}; return true; }
-  catch { return false; }
+  try {
+    const [main, ...cus] = s.split('-');
+    if (main.length < ORDER.length + 2) return false;
+    ORDER.forEach((k, i) => { const o = OPTIONS[k][parseInt(main[i], 36)]; if (o) state[k] = o.id; });
+    state.carport = main[ORDER.length] === '1'; state.panels = main[ORDER.length + 1] === '1';
+    state.custom = {};
+    cus.forEach(c => { const k = ORDER[parseInt(c[0], 36)]; const hex = '#' + c.slice(1).toUpperCase(); if (k && /^#[0-9A-F]{6}$/.test(hex)) state.custom[k] = hex; });
+    return true;
+  } catch { return false; }
 }
 function persist() {
   const enc = encodeState();
-  try { localStorage.setItem('teder-config', enc); } catch {}
-  try { history.replaceState(null, '', location.pathname + location.search + '#v' + enc); } catch {}
+  try { localStorage.setItem('teder-cfg', enc); } catch {}
+  try { history.replaceState(null, '', location.pathname + location.search + '#c' + enc); } catch {}
+  updateQR();
 }
-const fromHash = location.hash.startsWith('#v') && loadState(location.hash.slice(2));
-if (!fromHash) { try { const s = localStorage.getItem('teder-config'); if (s) loadState(s); } catch {} }
+const fromHash = location.hash.startsWith('#c') && loadState(location.hash.slice(2));
+if (!fromHash) { try { const s = localStorage.getItem('teder-cfg'); if (s) loadState(s); } catch {} }
 document.querySelectorAll('#extras button').forEach(b => {
   const x = EXTRAS.find(e => e.id === b.dataset.id); b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
 });
@@ -369,7 +406,8 @@ render = function () {
   const cp = document.querySelector('#extras button[data-id="carport"]'); if (cp) cp.style.display = state.size === '270' ? 'none' : '';
 };
 
-const configLink = () => location.origin + location.pathname + '#v' + encodeState();
+const PUBLIC_URL = 'https://avatarapps.github.io/homeview/i0k9g95har/';
+const configLink = () => PUBLIC_URL + '#c' + encodeState();
 document.getElementById('copy-link').addEventListener('click', async () => {
   const msg = document.getElementById('link-msg');
   try { await navigator.clipboard.writeText(configLink()); msg.textContent = 'Link kopeeritud – see avab täpselt selle valiku.'; }

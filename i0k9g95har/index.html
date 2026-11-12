@@ -48,8 +48,8 @@
 
 <model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
   ar ar-modes="webxr quick-look scene-viewer" ar-scale="fixed" ar-placement="floor"
-  camera-controls touch-action="pan-y" shadow-intensity="1.1" shadow-softness="0.6"
-  environment-image="neutral" tone-mapping="agx" exposure="1.0"
+  camera-controls touch-action="pan-y" shadow-intensity="1" shadow-softness="0.35"
+  tone-mapping="aces" exposure="0.95"
   camera-orbit="155deg 78deg 30m" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
   field-of-view="32deg" interaction-prompt="none">
   <span class="lock">Mõõdud lukus · 1:1</span>
@@ -88,7 +88,7 @@
   <div class="group">
     <div class="label">Terrassilaud <b id="lbl-deck"></b></div>
     <div class="row" data-bind="deck"></div>
-    <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C4A07C"><span>Oma värvikood</span></label>
+    <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C79F76"><span>Oma värvikood</span></label>
   </div>
   <div class="group"><div class="label">Lisad</div><div class="row" id="extras"></div></div>
   <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. Androidis (Chrome) saab värve vahetada otse AR-vaates; iPhone'is vali enne ja vajuta siis „Vaata oma krundil“.</p>
@@ -160,7 +160,7 @@ const OPTIONS = {
     { id:'fassaad', name:'Fassaadiga sama', hex:null },
   ],
   deck: [
-    { id:'lehis', name:'Lehis', hex:'#C4A07C' },
+    { id:'lehis', name:'Lehis', hex:'#C79F76' },
     { id:'kuldne', name:'Kuldne mänd', hex:'#C9A36C' },
     { id:'hallpuit', name:'Hallikas puit', hex:'#9C978D' },
     { id:'pahkel', name:'Pähkel', hex:'#6B4E36' },
@@ -259,6 +259,7 @@ document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('
   if (valid(v)) { state.custom[i.dataset.customHex] = v.toUpperCase(); apply(); }
 }));
 
+mv.environmentImage = window.__SKY_URL ?? 'sky.hdr';
 mv.addEventListener('load', () => { cache = {}; apply(); });
 setModel();
 render();

@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Teder 224 m² – proovi oma krundil</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,500&display=swap">
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4/dist/model-viewer.min.js"></script>
 <style>
   :root { --ink:#1d1f22; --muted:#6b6f75; --line:#e3e1dc; --bg:#f6f5f2; }
@@ -72,15 +73,20 @@
     .sw[aria-pressed="true"]:hover { box-shadow:0 0 0 2px var(--ink); }
     .primary:hover { background:#34373c; }
   }
-  .house-nav { position:absolute; bottom:18px; z-index:3; display:flex; align-items:center; gap:8px; padding:9px 16px; border-radius:24px;
-    border:1px solid rgba(255,255,255,.75); background:rgba(255,255,255,.42); color:#1d1f22; font:600 14px/1 inherit; cursor:pointer;
-    backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); box-shadow:0 4px 18px rgba(0,0,0,.08); transition:background .2s, transform .2s; }
-  .house-nav.prev { left:16px; } .house-nav.next { right:16px; }
-  .house-nav .arr { font-size:22px; line-height:14px; font-weight:400; }
-  .house-nav:hover { background:rgba(255,255,255,.75); transform:translateY(-1px); }
+  .house-nav { position:absolute; bottom:18px; z-index:3; display:flex; align-items:center; gap:10px; padding:6px 4px;
+    border:0; background:none; color:#fff; cursor:pointer; opacity:.78;
+    font:italic 500 26px/1 'Cormorant Garamond', Georgia, serif; letter-spacing:.02em;
+    text-shadow:0 1px 2px rgba(0,0,0,.35), 0 0 18px rgba(0,0,0,.18);
+    transition:opacity .25s ease, transform .25s ease; }
+  .house-nav.prev { left:22px; } .house-nav.next { right:22px; }
+  .house-nav .arr { font:300 30px/1 'Cormorant Garamond', Georgia, serif; font-style:normal; transition:transform .25s ease; }
+  .house-nav:hover { opacity:1; }
+  .house-nav.prev:hover .arr { transform:translateX(-4px); }
+  .house-nav.next:hover .arr { transform:translateX(4px); }
+  .house-nav .nm { border-bottom:1px solid transparent; transition:border-color .25s ease; }
+  .house-nav:hover .nm { border-bottom-color:rgba(255,255,255,.7); }
   model-viewer[ar-status="session-started"] .house-nav { display:none; }
   body.scrolled .house-nav { opacity:0; pointer-events:none; }
-  .house-nav { transition:background .2s, transform .2s, opacity .25s; }
   .qr-card { display:none; }
   @media (min-width: 1240px) and (hover: hover) {
     .qr-card { display:block; position:absolute; top:22px; right:40px; width:260px; padding:20px 20px 18px; background:rgba(246,245,242,.55);
@@ -104,8 +110,8 @@
   tone-mapping="aces" exposure="0.95"
   camera-orbit="-25deg 74deg 30m" field-of-view="32deg" camera-target="0m 2m -7m" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
   interaction-prompt="none">
-  <button class="house-nav prev" type="button" id="nav-prev" aria-label="Eelmine maja"><span class="arr">‹</span><span class="nm"></span></button>
-  <button class="house-nav next" type="button" id="nav-next" aria-label="Järgmine maja"><span class="nm"></span><span class="arr">›</span></button>
+  <button class="house-nav prev" type="button" id="nav-prev" aria-label="Eelmine maja"><span class="arr">←</span><span class="nm"></span></button>
+  <button class="house-nav next" type="button" id="nav-next" aria-label="Järgmine maja"><span class="nm"></span><span class="arr">→</span></button>
   <span class="lock">Mõõdud lukus · 1:1</span>
   <button slot="ar-button" class="ar-btn">Vaata oma krundil</button>
   <div class="ar-bar">

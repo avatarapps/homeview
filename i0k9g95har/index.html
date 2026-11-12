@@ -55,7 +55,7 @@
   .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
   /* house stays fixed at the top; the options scroll up over it on a see-through sheet */
   model-viewer { position:fixed; top:0; left:0; right:0; width:100%; height:calc(58vh + 62px); min-height:380px; z-index:0; }
-  header { position:relative; z-index:2; background:rgba(246,245,242,.72); }
+  header { position:relative; z-index:2; background:rgba(246,245,242,.5); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
   .spacer { height:58vh; min-height:318px; pointer-events:none; }
   .ar-alt, .panel, .quote { position:relative; z-index:1; background:rgba(246,245,242,.55); }
   .panel { max-width:none; } .panel > * { max-width:900px; }

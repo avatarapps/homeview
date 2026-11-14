@@ -335,7 +335,7 @@ const hasCarport = () => house.extras.includes('carport') && state.carport;
 const hasGarage = () => house.id === 'teder' && state.size === '270';
 const hasPanels = () => house.extras.includes('panels') && state.panels;
 const glbName = () => `${house.id}${state.size}_c${+hasCarport()}_p${+hasPanels()}_m${state.muntins === 'jah' ? 1 : 0}`;
-const BUILD = '20261114e';   // bump on every model update so browsers don't show cached models
+const BUILD = '20261114f';   // bump on every model update so browsers don't show cached models
 const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb?v=${BUILD}`;
 
 async function setTex(m, base, normal = true) {

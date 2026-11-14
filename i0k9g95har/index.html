@@ -17,7 +17,7 @@
   model-viewer { width:100%; height:60vh; min-height:360px; background:linear-gradient(#cfdbe6 0%,#e9edf0 55%,#e4e2dc 100%); }
   .ar-btn { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); border:0; border-radius:24px;
             background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:12px 20px; box-shadow:0 4px 14px rgba(0,0,0,.25); }
-  .lock { position:absolute; top:72px; left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
+  .lock { position:absolute; top:calc(var(--hh, 50px) + 12px); left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
   .ar-bar { display:none; position:absolute; left:8px; right:8px; bottom:16px; gap:8px; flex-direction:column;
             background:rgba(255,255,255,.9); border-radius:16px; padding:10px; backdrop-filter:blur(6px); }
   model-viewer[ar-status="session-started"] .ar-bar { display:flex; }
@@ -101,12 +101,31 @@
   .file-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0; }
   .quote .file-btn { padding:10px 16px; border-radius:24px; display:inline-flex; gap:0; color:var(--ink); font-size:14px; font-weight:600; }
   #thumbs:empty { display:none; }
+  /* phone: short title + inviting AR button in the header, nothing covering the house */
+  .hdr-ar { display:none; }
+  @keyframes arPulse { 0% { box-shadow:0 0 0 0 rgba(29,31,34,.45), 0 4px 14px rgba(0,0,0,.22); }
+                       70% { box-shadow:0 0 0 12px rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); }
+                       100% { box-shadow:0 0 0 0 rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); } }
+  @media (max-width: 700px) {
+    header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px 10px 16px; }
+    h1 { font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    h1 .tail { display:none; }
+    .hdr-ar { display:inline-flex; flex:0 0 auto; align-items:center; gap:8px; border:0; border-radius:24px; cursor:pointer;
+              background:var(--ink); color:#fff; font:600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              padding:11px 16px 11px 13px; box-shadow:0 4px 14px rgba(0,0,0,.22); animation:arPulse 2.4s ease-out .8s 3; }
+    .hdr-ar svg { width:18px; height:18px; }
+    .hdr-ar:active { transform:scale(.97); }
+    model-viewer .ar-btn { display:none; }
+    .house-nav { font-size:21px; bottom:14px; gap:7px; } .house-nav .arr { font-size:24px; }
+    .house-nav.prev { left:14px; } .house-nav.next { right:14px; }
+  }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 <header>
-  <h1>Teder 224 m² – proovi oma krundil</h1>
+  <h1><span class="hn">Teder 224 m²</span><span class="tail"> – proovi oma krundil</span></h1>
+  <button class="hdr-ar" type="button" id="hdr-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.8 20 7.3v9.4l-8 4.5-8-4.5V7.3z"/><path d="M4 7.3l8 4.5 8-4.5M12 11.8v9.4"/></svg>Vaata oma krundil</button>
 </header>
 
 <model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
@@ -510,7 +529,7 @@ const _render = render;
 render = function () {
   _render(); renderSummary(); persist();
   const sz = find('size', state.size);
-  document.querySelector('h1').textContent = `${house.name} ${sz.short} m² – proovi oma krundil`;
+  document.querySelector('h1 .hn').textContent = `${house.name} ${sz.short} m²`;
   document.title = `${house.name} ${sz.short} m² – proovi oma krundil`;
   const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz`;
   const ex = document.getElementById('extras');
@@ -574,6 +593,12 @@ document.getElementById('qform').addEventListener('submit', async e => {
 });
 
 if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');
+// header AR button (phone layout) starts the same AR session as the in-viewer button
+const hdrAr = document.getElementById('hdr-ar');
+hdrAr.addEventListener('click', () => { const v = document.getElementById('mv'); if (v.canActivateAR) v.activateAR(); else document.getElementById('mv').scrollIntoView(); });
+document.getElementById('mv').addEventListener('load', e => { if (!e.target.canActivateAR) hdrAr.style.display = 'none'; });
+const setHH = () => document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
+new ResizeObserver(setHH).observe(document.querySelector('header')); setHH();
 addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive:true });
 setModel();
 render();

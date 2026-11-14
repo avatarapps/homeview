@@ -312,7 +312,7 @@ const HOUSES = [
     defaults:{ size:'129', facadeMat:'boards_v', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
   { id:'hiireviu', name:'Hiireviu', extras:[],
     sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
-    cam:{ '161':[27,-7.8,35,35] },
+    cam:{ '161':[27,-7.8,35,35,2.6] },
     defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'hall', frame:'must', muntins:'jah', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
 ];
 let house = HOUSES[0];
@@ -368,7 +368,7 @@ function setModel() {
   const n = glbName();
   if (mv.dataset.glb !== n) {
     const camKey = house.id + state.size;
-    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg 74deg ${d}m`, `0m 2m ${tz}m`]; }
+    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm, ty = 2] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg 74deg ${d}m`, `0m ${ty}m ${tz}m`]; }
     mv.dataset.glb = n; mv.src = glbUrl(n);
   }
   else apply();

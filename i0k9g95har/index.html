@@ -424,9 +424,9 @@ function persist() {
   const enc = encodeState();
   saved[house.id] = snapshot();
   try {
-    localStorage.setItem('hv-house', house.id);
-    localStorage.setItem('hv-saved', JSON.stringify(saved));
-    localStorage.setItem('hv-touched', JSON.stringify([...touched]));
+    localStorage.setItem('hv2-house', house.id);
+    localStorage.setItem('hv2-saved', JSON.stringify(saved));
+    localStorage.setItem('hv2-touched', JSON.stringify([...touched]));
   } catch {}
   try { history.replaceState(null, '', location.pathname + location.search + '#h' + hIdx() + enc); } catch {}
   updateQR();
@@ -443,18 +443,14 @@ function switchHouse(dir) {
   for (const k of Object.keys(state)) if (!['custom'].includes(k)) delete state[k];
   if (saved[next.id]) Object.assign(state, saved[next.id]);
   else {
-    // first visit: start from this house's own look, carry over what the visitor has chosen themselves
+    // first visit: the house opens with its own look
     Object.assign(state, next.defaults, { custom:{}, carport:false, panels:false });
-    for (const k of touched) {
-      if (prevState.custom[k]) state.custom[k] = prevState.custom[k];
-      else if (OPTIONS[k] && OPTIONS[k].some(o => o.id === prevState[k])) state[k] = prevState[k];
-    }
   }
   setModel(); render();
 }
 document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropagation(); switchHouse(-1); });
 document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
-try { Object.assign(saved, JSON.parse(localStorage.getItem('hv-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv-touched') || '[]')); } catch {}
+try { Object.assign(saved, JSON.parse(localStorage.getItem('hv2-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv2-touched') || '[]')); } catch {}
 let fromHash = false;
 if (location.hash.startsWith('#h')) {
   const h = HOUSES[parseInt(location.hash[2], 10)];
@@ -463,7 +459,7 @@ if (location.hash.startsWith('#h')) {
   fromHash = loadState(location.hash.slice(2));            // older Teder-only links
 }
 if (!fromHash) {
-  let id = null; try { id = localStorage.getItem('hv-house'); } catch {}
+  let id = null; try { id = localStorage.getItem('hv2-house'); } catch {}
   const h = HOUSES.find(x => x.id === id);
   if (h) { useHouse(h); if (saved[h.id]) Object.assign(state, saved[h.id]); }
 }

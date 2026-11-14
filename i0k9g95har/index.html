@@ -55,7 +55,7 @@
   .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
   /* house stays fixed at the top; the options scroll up over it on a see-through sheet */
   model-viewer { position:fixed; top:0; left:0; right:0; width:100%; height:calc(58vh + 62px); min-height:380px; z-index:0; }
-  header { position:relative; z-index:2; background:rgba(246,245,242,.5); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); }
+  header { position:relative; z-index:2; background:rgba(246,245,242,.55); }
   .spacer { height:58vh; min-height:318px; pointer-events:none; }
   .ar-alt, .panel, .quote { position:relative; z-index:1; background:rgba(246,245,242,.55); }
   .panel { max-width:none; } .panel > * { max-width:900px; }
@@ -95,13 +95,18 @@
     #qr { width:180px; height:180px; margin:0 auto; padding:10px; background:#fff; border-radius:10px; box-sizing:content-box; } #qr svg { width:100%; height:100%; display:block; }
     .qr-sub { font-size:13px; color:var(--muted); margin-top:12px; line-height:1.35; }
   }
+  .files { display:grid; gap:6px; }
+  .files .flabel { font-size:13px; color:var(--muted); }
+  .file-btn { display:inline-flex; align-items:center; width:max-content; position:relative; overflow:hidden; }
+  .file-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0; }
+  .quote .file-btn { padding:10px 16px; border-radius:24px; display:inline-flex; gap:0; color:var(--ink); font-size:14px; font-weight:600; }
+  #thumbs:empty { display:none; }
 </style>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 </head>
 <body>
 <header>
   <h1>Teder 224 m² – proovi oma krundil</h1>
-  <div class="sub">Ligikaudne mudel Soome Maja avaliku plaani põhjal · privaatne demo</div>
 </header>
 
 <model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
@@ -159,21 +164,19 @@
     <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C79F76"><span>Oma värvikood</span></label>
   </div>
   <div class="group"><div class="label">Lisad</div><div class="row" id="extras"></div></div>
-  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt (päästikunupp) ja lisa see allpool päringule.</p>
+  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt ja lisa see allpool päringule.</p>
   <div class="group">
     <div class="label">Sinu valik</div>
     <dl id="summary"></dl>
     <div class="cta-bar">
       <button class="primary" type="button" id="go-quote">Küsi pakkumist</button>
-      <button class="secondary" type="button" id="copy-link">Kopeeri link sellele valikule</button>
+      <button class="secondary" type="button" id="copy-link">Kopeeri link nende valikutega</button>
     </div>
-    <div class="sub" id="link-msg"></div>
   </div>
 </div>
 
 <section class="quote" id="pakkumine">
   <h2>Küsi pakkumist</h2>
-  <div class="sub">Müüja saab kõik sinu valikud ja pildid majast sinu krundil. Kohtumist ei pea kokku leppima.</div>
   <form id="qform">
     <label>Nimi<input name="nimi" required autocomplete="name"></label>
     <label>E-post<input name="email" type="email" required autocomplete="email"></label>
@@ -181,7 +184,7 @@
     <label>Krundi asukoht<input name="krunt" placeholder="aadress või katastritunnus"></label>
     <label>Valmidusaste<select name="valmidus"><option>Tehasepakett</option><option>Valge karp</option><option>Võtmed kätte</option><option>Ei tea veel</option></select></label>
     <label>Millal soovid ehitada?<select name="aeg"><option>0–6 kuu jooksul</option><option>6–12 kuu jooksul</option><option>1–2 aasta jooksul</option><option>Uurin alles</option></select></label>
-    <label>Pildid krundilt (AR-pildid galeriist)<input name="pildid" type="file" accept="image/*" multiple></label>
+    <div class="files"><span class="flabel">Pildid krundilt</span><label class="secondary file-btn">+ Lisa pildid galeriist<input name="pildid" type="file" accept="image/*" multiple></label></div>
     <div id="thumbs"></div>
     <label>Lisainfo<textarea name="info" rows="3" placeholder="nt soovin saunat, laiemat terrassi …"></textarea></label>
     <button class="primary" type="submit">Saada päring</button>
@@ -490,7 +493,6 @@ render = function () {
   const sz = find('size', state.size);
   document.querySelector('h1').textContent = `${house.name} ${sz.short} m² – proovi oma krundil`;
   document.title = `${house.name} ${sz.short} m² – proovi oma krundil`;
-  document.querySelector('.sub').textContent = `Ligikaudne mudel Soome Maja avaliku plaani põhjal · privaatne demo`;
   const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz`;
   const ex = document.getElementById('extras');
   ex.closest('.group').style.display = house.extras.length ? '' : 'none';
@@ -506,10 +508,10 @@ render = function () {
 
 const PUBLIC_URL = 'https://avatarapps.github.io/homeview/i0k9g95har/';
 const configLink = () => PUBLIC_URL + '#h' + hIdx() + encodeState();
-document.getElementById('copy-link').addEventListener('click', async () => {
-  const msg = document.getElementById('link-msg');
-  try { await navigator.clipboard.writeText(configLink()); msg.textContent = 'Link kopeeritud – see avab täpselt selle valiku.'; }
-  catch { msg.textContent = configLink(); }
+document.getElementById('copy-link').addEventListener('click', async e => {
+  const btn = e.currentTarget;
+  try { await navigator.clipboard.writeText(configLink()); } catch {}
+  btn.textContent = 'Kopeeritud ✓'; setTimeout(() => btn.textContent = 'Kopeeri link nende valikutega', 1600);
 });
 document.getElementById('go-quote').addEventListener('click', () => document.getElementById('pakkumine').scrollIntoView({ behavior: 'smooth' }));
 

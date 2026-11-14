@@ -462,9 +462,9 @@ function persist() {
   const enc = encodeState();
   saved[house.id] = snapshot();
   try {
-    localStorage.setItem('hv3-house', house.id);
-    localStorage.setItem('hv3-saved', JSON.stringify(saved));
-    localStorage.setItem('hv3-touched', JSON.stringify([...touched]));
+    localStorage.setItem('hv4-house', house.id);
+    localStorage.setItem('hv4-saved', JSON.stringify(saved));
+    localStorage.setItem('hv4-touched', JSON.stringify([...touched]));
   } catch {}
   try { history.replaceState(null, '', location.pathname + location.search + '#h' + hIdx() + enc); } catch {}
   updateQR();
@@ -488,7 +488,7 @@ function switchHouse(dir) {
 }
 document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropagation(); switchHouse(-1); });
 document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
-try { Object.assign(saved, JSON.parse(localStorage.getItem('hv3-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv3-touched') || '[]')); } catch {}
+try { Object.assign(saved, JSON.parse(localStorage.getItem('hv4-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv4-touched') || '[]')); } catch {}
 let fromHash = false;
 if (location.hash.startsWith('#h')) {
   const h = HOUSES[parseInt(location.hash[2], 10)];
@@ -497,7 +497,7 @@ if (location.hash.startsWith('#h')) {
   fromHash = loadState(location.hash.slice(2));            // older Teder-only links
 }
 if (!fromHash) {
-  let id = null; try { id = localStorage.getItem('hv3-house'); } catch {}
+  let id = null; try { id = localStorage.getItem('hv4-house'); } catch {}
   const h = HOUSES.find(x => x.id === id);
   if (h) { useHouse(h); if (saved[h.id]) Object.assign(state, saved[h.id]); }
 }

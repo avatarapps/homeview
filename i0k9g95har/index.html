@@ -305,11 +305,11 @@ const OPTIONS = {
 };
 const HOUSES = [
   { id:'teder', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
-    cam:{ '187':[27,-6.5], '224':[30,-7], '270':[36,-8.5] },
+    cam:{ '187':[27,-6.5,-25,24], '224':[30,-7,-25,26], '270':[36,-8.5,-25,32] },
     defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis' } },
   { id:'oobik', name:'Ööbik', extras:[],
     sizes:[ { id:'129', name:'Bruto 128,7 m² · neto 101,7 m²', short:'129', brutto:'128,7', netto:'101,7' } ],
-    cam:{ '129':[30,-10,-35] },
+    cam:{ '129':[30,-10,-35,40] },
     defaults:{ size:'129', facadeMat:'boards_v', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
   { id:'hiireviu', name:'Hiireviu', extras:[],
     sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
@@ -368,7 +368,7 @@ function setModel() {
   const n = glbName();
   if (mv.dataset.glb !== n) {
     const camKey = house.id + state.size;
-    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d, tz, az = -25] = house.cam[state.size]; pendingCam = [`${az}deg 74deg ${d}m`, `0m 2m ${tz}m`]; }
+    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg 74deg ${d}m`, `0m 2m ${tz}m`]; }
     mv.dataset.glb = n; mv.src = glbUrl(n);
   }
   else apply();

@@ -335,7 +335,8 @@ const hasCarport = () => house.extras.includes('carport') && state.carport;
 const hasGarage = () => house.id === 'teder' && state.size === '270';
 const hasPanels = () => house.extras.includes('panels') && state.panels;
 const glbName = () => `${house.id}${state.size}_c${+hasCarport()}_p${+hasPanels()}_m${state.muntins === 'jah' ? 1 : 0}`;
-const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb`;
+const BUILD = '20261114c';   // bump on every model update so browsers don't show cached models
+const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb?v=${BUILD}`;
 
 async function setTex(m, base, normal = true) {
   if (!m) return;
@@ -531,7 +532,7 @@ render = function () {
   const sz = find('size', state.size);
   document.querySelector('h1 .hn').textContent = `${house.name} ${sz.short} m²`;
   document.title = `${house.name} ${sz.short} m² – proovi oma krundil`;
-  const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz`;
+  const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz?v=${BUILD}`;
   const ex = document.getElementById('extras');
   ex.closest('.group').style.display = house.extras.length ? '' : 'none';
   document.getElementById('grp-garage').style.display = hasGarage() ? '' : 'none';

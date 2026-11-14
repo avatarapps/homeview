@@ -187,6 +187,7 @@
     <div class="files"><span class="flabel">Pildid krundilt</span><label class="secondary file-btn">+ Lisa pildid galeriist<input name="pildid" type="file" accept="image/*" multiple></label></div>
     <div id="thumbs"></div>
     <label>Lisainfo<textarea name="info" rows="3" placeholder="nt soovin saunat, laiemat terrassi …"></textarea></label>
+    <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
     <button class="primary" type="submit">Saada päring</button>
     <div class="sub" id="qmsg"></div>
   </form>
@@ -517,22 +518,36 @@ fileInput.addEventListener('change', () => {
   const t = document.getElementById('thumbs'); t.innerHTML = '';
   [...fileInput.files].forEach(f => { const i = document.createElement('img'); i.src = URL.createObjectURL(f); t.appendChild(i); });
 });
+const STARTED = Date.now();
+const API = 'https://www.secondsun.ee/api/homeview-paring';
 document.getElementById('qform').addEventListener('submit', async e => {
   e.preventDefault();
-  const f = new FormData(e.target), msg = document.getElementById('qmsg');
-  const lines = [`Päring: ${house.name} ${find('size', state.size).short} m²`, '',
-    ...summaryRows().map(([a, b]) => `${a}: ${b}`), '',
-    `Nimi: ${f.get('nimi')}`, `E-post: ${f.get('email')}`, f.get('tel') ? `Telefon: ${f.get('tel')}` : null,
-    `Krunt: ${f.get('krunt') || '-'}`, `Valmidusaste: ${f.get('valmidus')}`, `Ehitusaeg: ${f.get('aeg')}`,
-    f.get('info') ? `Lisainfo: ${f.get('info')}` : null, '', `Konfiguratsioon 3D-s: ${configLink()}`].filter(l => l !== null);
-  const text = lines.join('\n');
-  const files = [...fileInput.files];
-  if (navigator.canShare && navigator.canShare({ files, text })) {
-    try { await navigator.share({ title: `Päring: ${house.name} ${find('size', state.size).short} m²`, text, files }); msg.textContent = 'Päring koos piltidega on valmis saatmiseks.'; return; }
-    catch (err) { if (err.name === 'AbortError') return; }
+  const form = e.target, f = new FormData(form), msg = document.getElementById('qmsg');
+  const btn = form.querySelector('button[type=submit]');
+  const sz = find('size', state.size);
+  const meta = {
+    house: `${house.name} ${sz.short} m²`, summary: summaryRows(), link: configLink(),
+    name: f.get('nimi'), email: f.get('email'), phone: f.get('tel'), plot: f.get('krunt'),
+    stage: f.get('valmidus'), timing: f.get('aeg'), info: f.get('info'), website: f.get('website'), startedAt: STARTED,
+  };
+  const body = new FormData();
+  body.append('meta', JSON.stringify(meta));
+  [...fileInput.files].slice(0, 5).forEach(file => body.append('files', file, file.name));
+  btn.disabled = true; btn.textContent = 'Saadan…'; msg.textContent = '';
+  try {
+    const res = await fetch(API, { method: 'POST', body });
+    const out = await res.json().catch(() => ({}));
+    if (res.ok && out.ok) {
+      form.reset(); document.getElementById('thumbs').innerHTML = '';
+      btn.textContent = 'Päring saadetud ✓';
+      msg.textContent = 'Aitäh! Müüja võtab sinuga ühendust.';
+      return;
+    }
+    msg.textContent = out.message || 'Saatmine ebaõnnestus. Proovi uuesti.';
+  } catch {
+    msg.textContent = 'Saatmine ebaõnnestus – kontrolli internetiühendust ja proovi uuesti.';
   }
-  location.href = 'mailto:?subject=' + encodeURIComponent(`Päring: ${house.name} ${find('size', state.size).short} m²`) + '&body=' + encodeURIComponent(text);
-  msg.textContent = files.length ? 'E-post avanes valikutega – lisa pildid kirjale manusena.' : 'E-post avanes valikutega.';
+  btn.disabled = false; btn.textContent = 'Saada päring';
 });
 
 if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');

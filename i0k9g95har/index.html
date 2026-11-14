@@ -157,6 +157,11 @@
     <div class="row" data-bind="door"></div>
     <label class="custom"><input type="color" data-custom="door"><input type="text" maxlength="7" data-custom-hex="door" placeholder="#8A6A4C"><span>Oma värvikood</span></label>
   </div>
+  <div class="group" id="grp-garage">
+    <div class="label">Garaažiuks <b id="lbl-garage"></b></div>
+    <div class="row" data-bind="garage"></div>
+    <label class="custom"><input type="color" data-custom="garage"><input type="text" maxlength="7" data-custom-hex="garage" placeholder="#2C3243"><span>Oma värvikood</span></label>
+  </div>
   <div class="group"><div class="label">Otsalauad <b id="lbl-fascia"></b></div><div class="row" data-bind="fascia"></div></div>
   <div class="group">
     <div class="label">Terrassilaud <b id="lbl-deck"></b></div>
@@ -217,7 +222,7 @@ const OPTIONS = {
     { id:'lumivalge', name:'Lumivalge', hex:'#F2F0EA' },
     { id:'punamuld', name:'Punamuld', hex:'#7A2E22' },
     { id:'ooker',    name:'Ooker', hex:'#B98A3E' },
-    { id:'puit',     name:'Naturaalne puit', hex:'#A87A4C' },
+    { id:'puit',     name:'Naturaalne puit', hex:'#B58556' },
   ],
   roofMat: [
     { id:'sindel', name:'Bituumensindel', tex:'shingle', rough:0.85, metal:0 },
@@ -263,6 +268,14 @@ const OPTIONS = {
     { id:'punane', name:'Punane', hex:'#7A2E22' },
     { id:'fassaad', name:'Fassaadiga sama', hex:null },
   ],
+  garage: [
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+  ],
   deck: [
     { id:'lehis', name:'Lehis', hex:'#C79F76' },
     { id:'kuldne', name:'Kuldne mänd', hex:'#C9A36C' },
@@ -274,15 +287,15 @@ const OPTIONS = {
 const HOUSES = [
   { id:'teder', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
     cam:{ '187':[27,-6.5], '224':[30,-7], '270':[36,-8.5] },
-    defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', deck:'lehis' } },
+    defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis' } },
   { id:'oobik', name:'Ööbik', extras:[],
     sizes:[ { id:'129', name:'Bruto 128,7 m² · neto 101,7 m²', short:'129', brutto:'128,7', netto:'101,7' } ],
-    cam:{ '129':[27,-7.9,40] },
-    defaults:{ size:'129', facadeMat:'boards_h', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'grafiit', deck:'lehis' } },
+    cam:{ '129':[30,-10,-35] },
+    defaults:{ size:'129', facadeMat:'boards_v', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
   { id:'hiireviu', name:'Hiireviu', extras:[],
     sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
     cam:{ '161':[27,-7.8,35] },
-    defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'grafiit', frame:'valge', muntins:'jah', fascia:'tume', door:'must', deck:'lehis' } },
+    defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'hall', frame:'must', muntins:'jah', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
 ];
 let house = HOUSES[0];
 let pendingCam = null;
@@ -291,15 +304,16 @@ let touched = new Set();
 const SWATCH_GROUPS = ['facadeColor', 'roofColor'];
 const EXTRAS = [ { id:'carport', name:'Autovarjualune' }, { id:'panels', name:'Terrassi ribiseinad' } ];
 const state = { size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge',
-                muntins:'jah', fascia:'valge', door:'tamm', deck:'lehis', custom:{}, carport:false, panels:false };
+                muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis', custom:{}, carport:false, panels:false };
 
 const mv = document.getElementById('mv');
 let cache = {};
 const tex = name => cache[name] ??= mv.createTexture(window.__TEX ? window.__TEX[name] : `tex/${name}.png`);
 const mat = name => mv.model?.getMaterialByName(name);
 const find = (k, id) => OPTIONS[k].find(o => o.id === id);
-const colourOf = k => state.custom[k] ?? find(k, state[k]).hex ?? (k === 'facadeColor' ? '#2C3243' : colourOf('facadeColor'));
-const hasCarport = () => house.extras.includes('carport') && state.carport && state.size !== '270';
+const colourOf = k => state.custom[k] ?? find(k, state[k] ?? OPTIONS[k][0].id)?.hex ?? (k === 'facadeColor' ? '#2C3243' : colourOf('facadeColor'));
+const hasCarport = () => house.extras.includes('carport') && state.carport;
+const hasGarage = () => house.id === 'teder' && state.size === '270';
 const hasPanels = () => house.extras.includes('panels') && state.panels;
 const glbName = () => `${house.id}${state.size}_c${+hasCarport()}_p${+hasPanels()}_m${state.muntins === 'jah' ? 1 : 0}`;
 const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb`;
@@ -327,6 +341,7 @@ async function apply() {
   col('fascia', find('fascia', state.fascia).hex ?? colourOf('facadeColor'));
   col('deck', colourOf('deck'));
   col('door', state.custom.door ?? find('door', state.door).hex ?? colourOf('facadeColor'));
+  col('garage', colourOf('garage'));
   render();
 }
 
@@ -345,7 +360,7 @@ function render() {
     const k = row.dataset.bind;
     row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', !state.custom[k] && b.dataset.id === state[k]));
     const lbl = document.getElementById('lbl-' + k);
-    if (lbl) lbl.textContent = state.custom[k] ?? find(k, state[k]).name;
+    if (lbl) lbl.textContent = state.custom[k] ?? find(k, state[k] ?? OPTIONS[k][0].id)?.name ?? '';
   });
   document.querySelectorAll('#extras button').forEach(b => b.setAttribute('aria-pressed', state[b.dataset.id]));
   document.querySelectorAll('[data-custom]').forEach(i => { i.value = colourOf(i.dataset.custom).toLowerCase(); });
@@ -400,12 +415,14 @@ function updateQR() {
   const q = qrcode(0, 'M'); q.addData(configLink()); q.make();
   box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
 }
-const KEYS = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck','carport','panels'];
+const KEYS = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','garage','fascia','deck','carport','panels'];
 const ORDER = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck'];
+const CORDER = [...ORDER, 'garage'];
 function encodeState() {
   let s = ORDER.map(k => Math.max(0, OPTIONS[k].findIndex(o => o.id === state[k])).toString(36)).join('');
   s += (state.carport ? 1 : 0) + '' + (state.panels ? 1 : 0);
-  for (const [k, hex] of Object.entries(state.custom || {})) { const i = ORDER.indexOf(k); if (i >= 0) s += '-' + i.toString(36) + hex.replace('#', ''); }
+  s += Math.max(0, OPTIONS.garage.findIndex(o => o.id === state.garage)).toString(36);
+  for (const [k, hex] of Object.entries(state.custom || {})) { const i = CORDER.indexOf(k); if (i >= 0) s += '-' + i.toString(36) + hex.replace('#', ''); }
   return s;
 }
 function loadState(s) {
@@ -414,8 +431,9 @@ function loadState(s) {
     if (main.length < ORDER.length + 2) return false;
     ORDER.forEach((k, i) => { const o = OPTIONS[k][parseInt(main[i], 36)]; if (o) state[k] = o.id; });
     state.carport = main[ORDER.length] === '1'; state.panels = main[ORDER.length + 1] === '1';
+    state.garage = OPTIONS.garage[parseInt(main[ORDER.length + 2] || '0', 36)]?.id ?? 'fassaad';
     state.custom = {};
-    cus.forEach(c => { const k = ORDER[parseInt(c[0], 36)]; const hex = '#' + c.slice(1).toUpperCase(); if (k && /^#[0-9A-F]{6}$/.test(hex)) state.custom[k] = hex; });
+    cus.forEach(c => { const k = CORDER[parseInt(c[0], 36)]; const hex = '#' + c.slice(1).toUpperCase(); if (k && /^#[0-9A-F]{6}$/.test(hex)) state.custom[k] = hex; });
     return true;
   } catch { return false; }
 }
@@ -425,9 +443,9 @@ function persist() {
   const enc = encodeState();
   saved[house.id] = snapshot();
   try {
-    localStorage.setItem('hv2-house', house.id);
-    localStorage.setItem('hv2-saved', JSON.stringify(saved));
-    localStorage.setItem('hv2-touched', JSON.stringify([...touched]));
+    localStorage.setItem('hv3-house', house.id);
+    localStorage.setItem('hv3-saved', JSON.stringify(saved));
+    localStorage.setItem('hv3-touched', JSON.stringify([...touched]));
   } catch {}
   try { history.replaceState(null, '', location.pathname + location.search + '#h' + hIdx() + enc); } catch {}
   updateQR();
@@ -451,7 +469,7 @@ function switchHouse(dir) {
 }
 document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropagation(); switchHouse(-1); });
 document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
-try { Object.assign(saved, JSON.parse(localStorage.getItem('hv2-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv2-touched') || '[]')); } catch {}
+try { Object.assign(saved, JSON.parse(localStorage.getItem('hv3-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv3-touched') || '[]')); } catch {}
 let fromHash = false;
 if (location.hash.startsWith('#h')) {
   const h = HOUSES[parseInt(location.hash[2], 10)];
@@ -460,7 +478,7 @@ if (location.hash.startsWith('#h')) {
   fromHash = loadState(location.hash.slice(2));            // older Teder-only links
 }
 if (!fromHash) {
-  let id = null; try { id = localStorage.getItem('hv2-house'); } catch {}
+  let id = null; try { id = localStorage.getItem('hv3-house'); } catch {}
   const h = HOUSES.find(x => x.id === id);
   if (h) { useHouse(h); if (saved[h.id]) Object.assign(state, saved[h.id]); }
 }
@@ -478,6 +496,10 @@ function summaryRows() {
     const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));
     rows.push([l, v]);
   }
+  if (hasGarage()) {
+    const o = find('garage', state.garage);
+    rows.push(['Garaažiuks', state.custom.garage ? `oma toon ${state.custom.garage}` : o.name + (o.hex ? ` (${o.hex})` : '')]);
+  }
   if (house.extras.length) rows.push(['Lisad', [hasCarport() && 'autovarjualune', hasPanels() && 'terrassi ribiseinad'].filter(Boolean).join(', ') || 'ei']);
   return rows;
 }
@@ -493,9 +515,10 @@ render = function () {
   const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz`;
   const ex = document.getElementById('extras');
   ex.closest('.group').style.display = house.extras.length ? '' : 'none';
+  document.getElementById('grp-garage').style.display = hasGarage() ? '' : 'none';
   ex.querySelectorAll('button').forEach(b => {
     const x = EXTRAS.find(e => e.id === b.dataset.id);
-    b.style.display = house.extras.includes(x.id) && !(x.id === 'carport' && state.size === '270') ? '' : 'none';
+    b.style.display = house.extras.includes(x.id) ? '' : 'none';
     b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
   });
   const n = HOUSES.length, i = hIdx();

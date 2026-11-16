@@ -639,7 +639,33 @@ mv.addEventListener('ar-status', e => {
   if (e.detail.status === 'session-started') xrStarted = true;
   if (e.detail.status === 'not-presenting' || e.detail.status === 'failed') { xrStarted = false; unshift(); }
 });
+// --- iPhone: the Homeview App Clip (free dragging, nudge buttons, distance readout) ---
+const APP_CLIP_READY = false;     // switch on once the App Clip is live; ?clip=1 forces it for testing
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const hexOf = h => (h || '').replace('#', '');
+function clipLink() {
+  const base = new URL('.', location.href);
+  const sz = find('size', state.size);
+  const roof = find('roofMat', state.roofMat), fm = find('facadeMat', state.facadeMat);
+  const p = new URLSearchParams({
+    n: `${house.name} ${sz.short} m²`,
+    m: new URL(`app/${glbName()}.usdz`, base).href,
+    t: new URL('tex/', base).href,
+    d: String(arDist),
+    wall: hexOf(colourOf('facadeColor')), wallTex: fm.tex,
+    roof: hexOf(colourOf('roofColor')), roofTex: roof.tex, roofR: String(roof.rough), roofM: String(roof.metal),
+    deck: hexOf(colourOf('deck')), deckTex: 'deck',
+    frame: hexOf(colourOf('frame')), fascia: hexOf(colourOf('fascia')),
+    door: hexOf(state.custom.door ?? find('door', state.door).hex ?? colourOf('facadeColor')),
+    garage: hexOf(colourOf('garage')),
+  });
+  return 'https://homeview.secondsun.ee/ar?' + p.toString();
+}
+
 async function startAR() {
+  if (IS_IOS && !window.__GLB && (APP_CLIP_READY || new URLSearchParams(location.search).has('clip'))) {
+    location.href = clipLink(); return;
+  }
   if (!mv.canActivateAR) { mv.scrollIntoView(); return; }
   unshift();
   shiftHouse(-(arDist - 1));          // the model's front edge sits 1 m from its origin

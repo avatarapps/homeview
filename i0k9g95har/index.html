@@ -103,6 +103,7 @@
   #thumbs:empty { display:none; }
   /* phone: short title + inviting AR button in the header, nothing covering the house */
   .hdr-ar { display:none; }
+  body:not(.can-ar) #grp-ardist { display:none; }
   @keyframes arPulse { 0% { box-shadow:0 0 0 0 rgba(29,31,34,.45), 0 4px 14px rgba(0,0,0,.22); }
                        70% { box-shadow:0 0 0 12px rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); }
                        100% { box-shadow:0 0 0 0 rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); } }
@@ -151,6 +152,7 @@
     <div id="qr"></div>
     <div class="qr-sub">Skaneeri telefoniga – maja avaneb sinu valikutega päris suuruses.</div>
   </aside>
+  <div class="group" id="grp-ardist"><div class="label">Maja esikülg sinust AR-is <b id="lbl-ardist"></b></div><div class="row" id="ardist"></div></div>
   <div class="group"><div class="label">Maja suurus <b id="lbl-size"></b></div><div class="row" data-bind="size"></div></div>
   <div class="group"><div class="label">Fassaadi materjal <b id="lbl-facadeMat"></b></div><div class="row" data-bind="facadeMat"></div></div>
   <div class="group">
@@ -595,8 +597,46 @@ document.getElementById('qform').addEventListener('submit', async e => {
 if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');
 // header AR button (phone layout) starts the same AR session as the in-viewer button
 const hdrAr = document.getElementById('hdr-ar');
-hdrAr.addEventListener('click', () => { const v = document.getElementById('mv'); if (v.canActivateAR) v.activateAR(); else document.getElementById('mv').scrollIntoView(); });
-document.getElementById('mv').addEventListener('load', e => { if (!e.target.canActivateAR) hdrAr.style.display = 'none'; });
+// --- AR distance: the house is pushed this far away from the point where AR anchors it,
+// so it lands where it should stand on the plot instead of on top of the viewer.
+const AR_DISTS = [3, 10, 20, 30];
+let arDist = +(localStorage.getItem('hv-ardist') || 10);
+if (!AR_DISTS.includes(arDist)) arDist = 10;
+const distRow = document.getElementById('ardist');
+const drawDist = () => {
+  distRow.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.m === arDist));
+  document.getElementById('lbl-ardist').textContent = arDist + ' m';
+};
+for (const m of AR_DISTS) {
+  const b = document.createElement('button'); b.className = 'chip'; b.dataset.m = m; b.textContent = m + ' m';
+  b.addEventListener('click', () => { arDist = m; try { localStorage.setItem('hv-ardist', m); } catch (e) {} drawDist(); });
+  distRow.appendChild(b);
+}
+drawDist();
+const sceneOf = v => { const k = Object.getOwnPropertySymbols(v).find(x => x.description === 'scene'); return k ? v[k] : null; };
+let arShift = 0;
+const shiftHouse = dz => {
+  const sc = sceneOf(mv); if (!sc || !sc.models) return false;
+  for (const m of sc.models) { m.position.z += dz; m.updateMatrixWorld(true); }
+  arShift += dz; return true;
+};
+const unshift = () => { if (arShift) shiftHouse(-arShift); };
+let xrStarted = false;
+mv.addEventListener('ar-status', e => {
+  if (e.detail.status === 'session-started') xrStarted = true;
+  if (e.detail.status === 'not-presenting' || e.detail.status === 'failed') { xrStarted = false; unshift(); }
+});
+async function startAR() {
+  if (!mv.canActivateAR) { mv.scrollIntoView(); return; }
+  unshift();
+  shiftHouse(-(arDist - 1));          // the model's front edge sits 1 m from its origin
+  try { await mv.activateAR(); }
+  finally { if (!xrStarted) unshift(); }   // Quick Look got its own copy; WebXR keeps it until the session ends
+}
+hdrAr.addEventListener('click', startAR);
+const slotBtn = document.querySelector('.ar-btn');
+slotBtn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); startAR(); }, true);
+document.getElementById('mv').addEventListener('load', e => { if (!e.target.canActivateAR) hdrAr.style.display = 'none'; document.body.classList.toggle('can-ar', !!e.target.canActivateAR); });
 const setHH = () => document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
 new ResizeObserver(setHH).observe(document.querySelector('header')); setHH();
 addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive:true });

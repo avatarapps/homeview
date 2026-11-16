@@ -504,6 +504,7 @@ document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropa
 document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
 try { Object.assign(saved, JSON.parse(localStorage.getItem('hv4-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv4-touched') || '[]')); } catch {}
 let fromHash = false;
+useHouse(house); Object.assign(state, house.defaults);   // first house of this catalogue
 if (location.hash.startsWith('#h')) {
   const h = HOUSES[parseInt(location.hash[2], 10)];
   if (h) { useHouse(h); fromHash = loadState(location.hash.slice(3)); }

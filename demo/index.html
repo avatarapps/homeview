@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Teder 224 m² – proovi oma krundil</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,500&display=swap">
+<script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4/dist/model-viewer.min.js"></script>
+<style>
+  :root { --ink:#1d1f22; --muted:#6b6f75; --line:#e3e1dc; --bg:#f6f5f2; }
+  * { box-sizing:border-box; }
+  body { margin:0; font:15px/1.4 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; color:var(--ink); background:var(--bg); }
+  header { padding:14px 16px 8px; }
+  h1 { font-size:19px; margin:0; font-weight:650; }
+  .sub { color:var(--muted); font-size:12.5px; margin-top:3px; }
+  model-viewer { width:100%; height:60vh; min-height:360px; background:linear-gradient(#cfdbe6 0%,#e9edf0 55%,#e4e2dc 100%); }
+  .ar-btn { position:absolute; left:50%; bottom:14px; transform:translateX(-50%); border:0; border-radius:24px;
+            background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:12px 20px; box-shadow:0 4px 14px rgba(0,0,0,.25); }
+  .lock { position:absolute; top:calc(var(--hh, 50px) + 12px); left:10px; font-size:12px; background:rgba(255,255,255,.85); padding:5px 9px; border-radius:12px; }
+  .ar-bar { display:none; position:absolute; left:8px; right:8px; bottom:16px; gap:8px; flex-direction:column;
+            background:rgba(255,255,255,.9); border-radius:16px; padding:10px; backdrop-filter:blur(6px); }
+  model-viewer[ar-status="session-started"] .ar-bar { display:flex; }
+  model-viewer[ar-status="session-started"] .ar-btn { display:none; }
+  .row { display:flex; gap:8px; overflow-x:auto; padding:2px 2px 4px; }
+  .panel { padding:4px 16px 28px; max-width:900px; }
+  .group { padding:14px 0; border-bottom:1px solid var(--line); }
+  .label { font-size:12px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:9px; display:flex; justify-content:space-between; gap:12px; }
+  .label b { text-transform:none; letter-spacing:0; color:var(--ink); font-weight:600; }
+  .sw { flex:0 0 auto; width:40px; height:40px; border-radius:50%; border:2px solid #fff; box-shadow:0 0 0 1px var(--line); cursor:pointer; padding:0; }
+  .sw[aria-pressed="true"] { box-shadow:0 0 0 2px var(--ink); }
+  .chip { flex:0 0 auto; border:1px solid var(--line); background:#fff; border-radius:20px; padding:8px 13px; font-size:14px; cursor:pointer; color:var(--ink); display:flex; align-items:center; gap:7px; white-space:nowrap; }
+  .chip[aria-pressed="true"] { border-color:var(--ink); box-shadow:inset 0 0 0 1px var(--ink); }
+  .dot { width:16px; height:16px; border-radius:50%; display:inline-block; box-shadow:0 0 0 1px rgba(0,0,0,.15); }
+  .custom { display:flex; align-items:center; gap:8px; margin-top:10px; background:#fff; border:1px dashed #cfccc5; border-radius:12px; padding:8px 10px; width:max-content; }
+  .custom input[type=color] { width:34px; height:34px; border:0; padding:0; background:none; cursor:pointer; }
+  .custom input[type=text] { width:96px; font:inherit; padding:6px 8px; border:1px solid var(--line); border-radius:8px; text-transform:uppercase; }
+  .custom span { font-size:13px; color:var(--muted); }
+  .note { font-size:12.5px; color:var(--muted); padding-top:14px; }
+  .ar-bar .sw { width:32px; height:32px; }
+  .ar-bar .chip { padding:6px 10px; font-size:13px; }
+  .quote { padding:22px 16px 40px; max-width:900px; border-top:8px solid #ebe8e2; }
+  .quote h2 { font-size:19px; margin:0 0 4px; }
+  .quote form { display:grid; gap:12px; margin-top:14px; max-width:520px; }
+  .quote label { display:grid; gap:5px; font-size:13px; color:var(--muted); }
+  .quote input, .quote select, .quote textarea { font:inherit; color:var(--ink); padding:10px 11px; border:1px solid var(--line); border-radius:10px; background:#fff; }
+  .primary { border:0; border-radius:24px; background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:13px 20px; cursor:pointer; }
+  .secondary { border:1px solid var(--ink); border-radius:24px; background:#fff; color:var(--ink); font-size:14px; font-weight:600; padding:10px 16px; cursor:pointer; }
+  #summary { display:grid; grid-template-columns:auto 1fr; gap:6px 16px; margin:0 0 12px; font-size:14px; }
+  #summary dt { color:var(--muted); } #summary dd { margin:0; font-weight:550; }
+  #thumbs { display:flex; gap:8px; flex-wrap:wrap; } #thumbs img { width:84px; height:84px; object-fit:cover; border-radius:8px; }
+  .ar-alt { display:none; padding:10px 16px 0; font-size:13.5px; }
+  .ar-alt a { color:var(--ink); }
+  .is-ios .ar-alt { display:block; }
+  .cta-bar { display:flex; gap:10px; flex-wrap:wrap; padding:14px 0 4px; }
+  /* house stays fixed at the top; the options scroll up over it on a see-through sheet */
+  model-viewer { position:fixed; top:0; left:0; right:0; width:100%; height:calc(58vh + 62px); min-height:380px; z-index:0; }
+  header { position:relative; z-index:2; background:rgba(246,245,242,.55); }
+  .spacer { height:58vh; min-height:318px; pointer-events:none; }
+  .ar-alt, .panel, .quote { position:relative; z-index:1; background:rgba(246,245,242,.55); }
+  .panel { max-width:none; } .panel > * { max-width:900px; }
+  .quote { max-width:none; border-top:1px solid rgba(0,0,0,.08); }
+  @media (min-width: 900px) { model-viewer { height:calc(66vh + 62px); } .spacer { height:66vh; } }
+  @media (hover: hover) {
+    .chip, .secondary, .sw { transition:background .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+    .chip .dot { transition:transform .2s ease; }
+    .chip:hover, .secondary:hover { background:linear-gradient(180deg, #fdfaf4 0%, #f5ecdc 100%); border-color:#dccbab;
+      box-shadow:0 6px 16px -6px rgba(120, 88, 40, .28); transform:translateY(-1px); }
+    .chip:hover .dot { transform:scale(1.15); }
+    .chip:active, .secondary:active { transform:translateY(0); box-shadow:0 2px 6px -3px rgba(120, 88, 40, .3); }
+    .chip[aria-pressed="true"]:hover { border-color:var(--ink); }
+    .sw:hover { transform:scale(1.08); box-shadow:0 0 0 3px #f1e6d2; }
+    .sw[aria-pressed="true"]:hover { box-shadow:0 0 0 2px var(--ink); }
+    .primary:hover { background:#34373c; }
+  }
+  .house-nav { position:absolute; bottom:18px; z-index:3; display:flex; align-items:center; gap:10px; padding:6px 4px;
+    border:0; background:none; color:#fff; cursor:pointer; opacity:.78;
+    font:italic 500 26px/1 'Cormorant Garamond', Georgia, serif; letter-spacing:.02em;
+    text-shadow:0 1px 2px rgba(0,0,0,.35), 0 0 18px rgba(0,0,0,.18);
+    transition:opacity .25s ease, transform .25s ease; }
+  .house-nav.prev { left:22px; } .house-nav.next { right:22px; }
+  .house-nav .arr { font:300 30px/1 'Cormorant Garamond', Georgia, serif; font-style:normal; transition:transform .25s ease; }
+  .house-nav:hover { opacity:1; }
+  .house-nav.prev:hover .arr { transform:translateX(-4px); }
+  .house-nav.next:hover .arr { transform:translateX(4px); }
+  .house-nav .nm { border-bottom:1px solid transparent; transition:border-color .25s ease; }
+  .house-nav:hover .nm { border-bottom-color:rgba(255,255,255,.7); }
+  model-viewer[ar-status="session-started"] .house-nav { display:none; }
+  body.scrolled .house-nav { opacity:0; pointer-events:none; }
+  .qr-card { display:none; }
+  @media (min-width: 1240px) and (hover: hover) {
+    .qr-card { display:block; position:absolute; top:22px; right:40px; width:260px; padding:20px 20px 18px; background:rgba(246,245,242,.55);
+               border-radius:18px; box-shadow:0 10px 30px rgba(0,0,0,.08); text-align:center; }
+    .qr-title { font-size:17px; font-weight:650; line-height:1.25; margin-bottom:14px; }
+    #qr { width:180px; height:180px; margin:0 auto; padding:10px; background:#fff; border-radius:10px; box-sizing:content-box; } #qr svg { width:100%; height:100%; display:block; }
+    .qr-sub { font-size:13px; color:var(--muted); margin-top:12px; line-height:1.35; }
+  }
+  .files { display:grid; gap:6px; }
+  .files .flabel { font-size:13px; color:var(--muted); }
+  .file-btn { display:inline-flex; align-items:center; width:max-content; position:relative; overflow:hidden; }
+  .file-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; font-size:0; }
+  .quote .file-btn { padding:10px 16px; border-radius:24px; display:inline-flex; gap:0; color:var(--ink); font-size:14px; font-weight:600; }
+  #thumbs:empty { display:none; }
+  /* phone: short title + inviting AR button in the header, nothing covering the house */
+  .hdr-ar { display:none; }
+  .single-house .house-nav { display:none !important; }
+  body:not(.can-ar) #grp-ardist { display:none; }
+  @keyframes arPulse { 0% { box-shadow:0 0 0 0 rgba(29,31,34,.45), 0 4px 14px rgba(0,0,0,.22); }
+                       70% { box-shadow:0 0 0 12px rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); }
+                       100% { box-shadow:0 0 0 0 rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); } }
+  @media (max-width: 700px) {
+    header { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px 10px 16px; }
+    h1 { font-size:18px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    h1 .tail { display:none; }
+    .hdr-ar { display:inline-flex; flex:0 0 auto; align-items:center; gap:8px; border:0; border-radius:24px; cursor:pointer;
+              background:var(--ink); color:#fff; font:600 15px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+              padding:11px 16px 11px 13px; box-shadow:0 4px 14px rgba(0,0,0,.22); animation:arPulse 2.4s ease-out .8s 3; }
+    .hdr-ar svg { width:18px; height:18px; }
+    .hdr-ar:active { transform:scale(.97); }
+    model-viewer .ar-btn { display:none; }
+    .house-nav { font-size:21px; bottom:14px; gap:7px; } .house-nav .arr { font-size:24px; }
+    .house-nav.prev { left:14px; } .house-nav.next { right:14px; }
+  }
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+</head>
+<body>
+<header>
+  <h1><span class="hn">Teder 224 m²</span><span class="tail"> – proovi oma krundil</span></h1>
+  <button class="hdr-ar" type="button" id="hdr-ar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 2.8 20 7.3v9.4l-8 4.5-8-4.5V7.3z"/><path d="M4 7.3l8 4.5 8-4.5M12 11.8v9.4"/></svg>Vaata oma krundil</button>
+</header>
+
+<model-viewer id="mv" alt="Elementmaja Teder 3D-mudel"
+  ar ar-modes="webxr quick-look scene-viewer" ar-scale="fixed" ar-placement="floor"
+  camera-controls touch-action="pan-y" shadow-intensity="1" shadow-softness="0.35"
+  tone-mapping="aces" exposure="0.95"
+  camera-orbit="-25deg 74deg 30m" field-of-view="32deg" camera-target="0m 2m -7m" min-camera-orbit="auto auto 10m" max-camera-orbit="auto 88deg 80m"
+  interaction-prompt="none">
+  <button class="house-nav prev" type="button" id="nav-prev" aria-label="Eelmine maja"><span class="arr">←</span><span class="nm"></span></button>
+  <button class="house-nav next" type="button" id="nav-next" aria-label="Järgmine maja"><span class="nm"></span><span class="arr">→</span></button>
+  <span class="lock">Mõõdud lukus · 1:1</span>
+  <button slot="ar-button" class="ar-btn">Vaata oma krundil</button>
+  <div class="ar-bar">
+    <div class="row" data-bind="facadeColor" data-compact></div>
+    <div class="row" data-bind="roofColor" data-compact></div>
+  </div>
+</model-viewer>
+<div class="spacer"></div>
+
+<div class="panel">
+  <aside class="qr-card" aria-label="Vaata oma krundil">
+    <div class="qr-title">Vaata seda maja oma krundil</div>
+    <div id="qr"></div>
+    <div class="qr-sub">Skaneeri telefoniga – maja avaneb sinu valikutega päris suuruses.</div>
+  </aside>
+  <div class="group" id="grp-ardist"><div class="label">Maja esikülg sinust AR-is <b id="lbl-ardist"></b></div><div class="row" id="ardist"></div></div>
+  <div class="group"><div class="label">Maja suurus <b id="lbl-size"></b></div><div class="row" data-bind="size"></div></div>
+  <div class="group"><div class="label">Fassaadi materjal <b id="lbl-facadeMat"></b></div><div class="row" data-bind="facadeMat"></div></div>
+  <div class="group">
+    <div class="label">Fassaadi värv <b id="lbl-facadeColor"></b></div>
+    <div class="row" data-bind="facadeColor"></div>
+    <label class="custom"><input type="color" data-custom="facadeColor"><input type="text" maxlength="7" data-custom-hex="facadeColor" placeholder="#2C3243"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Katusekate <b id="lbl-roofMat"></b></div><div class="row" data-bind="roofMat"></div></div>
+  <div class="group">
+    <div class="label">Katuse värv <b id="lbl-roofColor"></b></div>
+    <div class="row" data-bind="roofColor"></div>
+    <label class="custom"><input type="color" data-custom="roofColor"><input type="text" maxlength="7" data-custom-hex="roofColor" placeholder="#2B313C"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group">
+    <div class="label">Aknaraamid <b id="lbl-frame"></b></div>
+    <div class="row" data-bind="frame"></div>
+    <label class="custom"><input type="color" data-custom="frame"><input type="text" maxlength="7" data-custom-hex="frame" placeholder="#F2F0EA"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Aknaruudud <b id="lbl-muntins"></b></div><div class="row" data-bind="muntins"></div></div>
+  <div class="group">
+    <div class="label">Välisuks <b id="lbl-door"></b></div>
+    <div class="row" data-bind="door"></div>
+    <label class="custom"><input type="color" data-custom="door"><input type="text" maxlength="7" data-custom-hex="door" placeholder="#8A6A4C"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group" id="grp-garage">
+    <div class="label">Garaažiuks <b id="lbl-garage"></b></div>
+    <div class="row" data-bind="garage"></div>
+    <label class="custom"><input type="color" data-custom="garage"><input type="text" maxlength="7" data-custom-hex="garage" placeholder="#2C3243"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Otsalauad <b id="lbl-fascia"></b></div><div class="row" data-bind="fascia"></div></div>
+  <div class="group">
+    <div class="label">Terrassilaud <b id="lbl-deck"></b></div>
+    <div class="row" data-bind="deck"></div>
+    <label class="custom"><input type="color" data-custom="deck"><input type="text" maxlength="7" data-custom-hex="deck" placeholder="#C79F76"><span>Oma värvikood</span></label>
+  </div>
+  <div class="group"><div class="label">Lisad</div><div class="row" id="extras"></div></div>
+  <p class="note">Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt ja lisa see allpool päringule.</p>
+  <div class="group">
+    <div class="label">Sinu valik</div>
+    <dl id="summary"></dl>
+    <div class="cta-bar">
+      <button class="primary" type="button" id="go-quote">Küsi pakkumist</button>
+      <button class="secondary" type="button" id="copy-link">Kopeeri link nende valikutega</button>
+    </div>
+  </div>
+</div>
+
+<section class="quote" id="pakkumine">
+  <h2>Küsi pakkumist</h2>
+  <form id="qform">
+    <label>Nimi<input name="nimi" required autocomplete="name"></label>
+    <label>E-post<input name="email" type="email" required autocomplete="email"></label>
+    <label>Telefon (soovi korral)<input name="tel" type="tel" autocomplete="tel"></label>
+    <label>Krundi asukoht<input name="krunt" placeholder="aadress või katastritunnus"></label>
+    <label>Valmidusaste<select name="valmidus"><option>Tehasepakett</option><option>Valge karp</option><option>Võtmed kätte</option><option>Ei tea veel</option></select></label>
+    <label>Millal soovid ehitada?<select name="aeg"><option>0–6 kuu jooksul</option><option>6–12 kuu jooksul</option><option>1–2 aasta jooksul</option><option>Uurin alles</option></select></label>
+    <div class="files"><span class="flabel">Pildid krundilt</span><label class="secondary file-btn">+ Lisa pildid<input name="pildid" type="file" accept="image/*" multiple></label></div>
+    <div id="thumbs"></div>
+    <label>Lisainfo<textarea name="info" rows="3" placeholder="nt soovin saunat, laiemat terrassi …"></textarea></label>
+    <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
+    <button class="primary" type="submit">Saada päring</button>
+    <div class="sub" id="qmsg"></div>
+  </form>
+</section>
+
+<script type="module">
+const OPTIONS = {
+  size: [
+    { id:'187', name:'Bruto 187,0 m² · neto 149,0 m²', short:'187', brutto:'187,0', netto:'149,0' },
+    { id:'224', name:'Bruto 223,9 m² · neto 184,1 m²', short:'224', brutto:'223,9', netto:'184,1' },
+    { id:'270', name:'Bruto 270,4 m² · neto 225,3 m² · garaažiga', short:'270', brutto:'270,4', netto:'225,3' },
+  ],
+  facadeMat: [
+    { id:'boards_v', name:'Laudis, vertikaalne', tex:'boards_v' },
+    { id:'boards_h', name:'Laudis, horisontaalne', tex:'boards_h' },
+    { id:'plaster',  name:'Krohv', tex:'plaster' },
+    { id:'palk',     name:'Palk', tex:'logs' },
+  ],
+  facadeColor: [
+    { id:'tormisinine', name:'Tormisinine', hex:'#2C3243' },
+    { id:'grafiit',  name:'Grafiit', hex:'#3A3D42' },
+    { id:'sysimust', name:'Süsimust', hex:'#1F2023' },
+    { id:'metsaroheline', name:'Metsaroheline', hex:'#3D4A3E' },
+    { id:'sinihall', name:'Sinakashall', hex:'#5E6B78' },
+    { id:'graniit',  name:'Graniithall', hex:'#8C8F8E' },
+    { id:'liivakivi', name:'Liivakivi', hex:'#CFC6B4' },
+    { id:'kriit',    name:'Kriit', hex:'#E4E0D6' },
+    { id:'lumivalge', name:'Lumivalge', hex:'#F2F0EA' },
+    { id:'punamuld', name:'Punamuld', hex:'#7A2E22' },
+    { id:'ooker',    name:'Ooker', hex:'#B98A3E' },
+    { id:'puit',     name:'Naturaalne puit', hex:'#CC9A5E' },
+    { id:'meepruun', name:'Meepruun', hex:'#A06A38' },
+  ],
+  roofMat: [
+    { id:'sindel', name:'Bituumensindel', tex:'shingle', rough:0.85, metal:0 },
+    { id:'valts', name:'Valtsplekk', tex:'seam', rough:0.6, metal:0.12 },
+    { id:'profiil', name:'Kivikattepleki profiil', tex:'metaltile', rough:0.55, metal:0.15 },
+    { id:'betoon', name:'Betoonkivi', tex:'tile', rough:0.85, metal:0 },
+    { id:'savi', name:'Savikivi', tex:'claytile', rough:0.75, metal:0 },
+    { id:'laast', name:'Puitlaast', tex:'woodshingle', rough:0.9, metal:0 },
+  ],
+  roofColor: [
+    { id:'tumesinine', name:'Tumesinine', hex:'#2B313C' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#2E3136' },
+    { id:'tumehall', name:'Tumehall', hex:'#43474D' },
+    { id:'hall', name:'Hall', hex:'#727272' },
+    { id:'hobe', name:'Hõbe', hex:'#A7AAAD' },
+    { id:'tumepruun', name:'Tumepruun', hex:'#3E2F27' },
+    { id:'punane', name:'Punane', hex:'#8E3B2A' },
+    { id:'telliskivi', name:'Telliskivi', hex:'#A0522D' },
+    { id:'roheline', name:'Tumeroheline', hex:'#2F3D33' },
+    { id:'laast', name:'Naturaalne laast', hex:'#9C7B57' },
+  ],
+  frame: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'kreem', name:'Kreemjas', hex:'#E8E0CF' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'tumehall', name:'Tumehall', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'pruun', name:'Pruun', hex:'#5A4232' },
+  ],
+  muntins: [ { id:'jah', name:'Ruutudega' }, { id:'ei', name:'Ilma ruutudeta' } ],
+  fascia: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'tume', name:'Tume', hex:'#2A2D31' },
+  ],
+  door: [
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+    { id:'pahkel', name:'Pähkel', hex:'#5A4232' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'punane', name:'Punane', hex:'#7A2E22' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+  ],
+  garage: [
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+  ],
+  deck: [
+    { id:'lehis', name:'Lehis', hex:'#C79F76' },
+    { id:'kuldne', name:'Kuldne mänd', hex:'#C9A36C' },
+    { id:'hallpuit', name:'Hallikas puit', hex:'#9C978D' },
+    { id:'pahkel', name:'Pähkel', hex:'#6B4E36' },
+    { id:'komposiit', name:'Grafiit komposiit', hex:'#55534F' },
+  ],
+};
+const ALL_HOUSES = [
+  { id:'teder', catalog:'soomemaja', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
+    cam:{ '187':[27,-6.5,-25,36], '224':[30,-7,-25,40], '270':[36,-8.5,-25,48] },
+    defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis' } },
+  { id:'oobik', catalog:'soomemaja', name:'Ööbik', extras:[],
+    sizes:[ { id:'129', name:'Bruto 128,7 m² · neto 101,7 m²', short:'129', brutto:'128,7', netto:'101,7' } ],
+    cam:{ '129':[30,-10,-35,40] },
+    defaults:{ size:'129', facadeMat:'boards_v', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
+  { id:'hiireviu', catalog:'soomemaja', name:'Hiireviu', extras:[],
+    sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
+    cam:{ '161':[27,-7.8,35,35,2.6] },
+    defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'hall', frame:'must', muntins:'jah', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
+  { id:'metsamaja', catalog:'demo', name:'Metsamaja', extras:[],
+    sizes:[ { id:'137', name:'Bruto 136,8 m² · neto 108,0 m²', short:'137', brutto:'136,8', netto:'108,0' } ],
+    cam:{ '137':[24,-7.7,-30,31,2.4] },
+    defaults:{ size:'137', facadeMat:'palk', facadeColor:'meepruun', roofMat:'laast', roofColor:'laast', frame:'pruun', muntins:'jah', fascia:'fassaad', door:'tamm', garage:'fassaad', deck:'kuldne' } },
+];
+// which houses this link shows: the Soome Maja demo lives in its own private folder, everything else is our demo house
+const CATALOG = new URLSearchParams(location.search).get('k')
+  || (location.pathname.includes('i0k9g95har') || window.__GLB ? 'soomemaja' : 'demo');
+const HOUSES = ALL_HOUSES.filter(h => h.catalog === CATALOG);
+if (HOUSES.length < 2) document.documentElement.classList.add('single-house');
+let house = HOUSES[0];
+let pendingCam = null;
+const saved = {};
+let touched = new Set();
+const SWATCH_GROUPS = ['facadeColor', 'roofColor'];
+const EXTRAS = [ { id:'carport', name:'Autovarjualune' }, { id:'panels', name:'Terrassi ribiseinad' } ];
+const state = { size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge',
+                muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis', custom:{}, carport:false, panels:false };
+
+const mv = document.getElementById('mv');
+let cache = {};
+const tex = name => cache[name] ??= mv.createTexture(window.__TEX ? window.__TEX[name] : `tex/${name}.png`);
+const mat = name => mv.model?.getMaterialByName(name);
+const find = (k, id) => OPTIONS[k].find(o => o.id === id);
+const colourOf = k => state.custom[k] ?? find(k, state[k] ?? OPTIONS[k][0].id)?.hex ?? (k === 'facadeColor' ? '#2C3243' : colourOf('facadeColor'));
+const hasCarport = () => house.extras.includes('carport') && state.carport;
+const hasGarage = () => house.id === 'teder' && state.size === '270';
+const hasPanels = () => house.extras.includes('panels') && state.panels;
+const glbName = () => `${house.id}${state.size}_c${+hasCarport()}_p${+hasPanels()}_m${state.muntins === 'jah' ? 1 : 0}`;
+const BUILD = '20261114g';   // bump on every model update so browsers don't show cached models
+const glbUrl = n => window.__GLB ? window.__GLB[n] : `${n}.glb?v=${BUILD}`;
+
+async function setTex(m, base, normal = true) {
+  if (!m) return;
+  m.pbrMetallicRoughness.baseColorTexture.setTexture(await tex(base));
+  if (normal && m.normalTexture) m.normalTexture.setTexture(await tex(base + '_n'));
+}
+const col = (name, hex) => mat(name)?.pbrMetallicRoughness.setBaseColorFactor(hex);
+
+async function apply() {
+  if (!mv.model) return;
+  const fm = find('facadeMat', state.facadeMat), rm = find('roofMat', state.roofMat);
+  await setTex(mat('wall'), fm.tex);
+  col('wall', colourOf('facadeColor'));
+  await setTex(mat('roof'), rm.tex);
+  col('roof', colourOf('roofColor'));
+  mat('roof').pbrMetallicRoughness.setRoughnessFactor(rm.rough);
+  mat('roof').pbrMetallicRoughness.setMetallicFactor(rm.metal);
+  await setTex(mat('soffit'), 'boards_h');
+  await setTex(mat('deck'), 'deck');
+  await setTex(mat('curtain'), 'curtain', false);
+  col('frame', colourOf('frame'));
+  col('fascia', find('fascia', state.fascia).hex ?? colourOf('facadeColor'));
+  col('deck', colourOf('deck'));
+  col('door', state.custom.door ?? find('door', state.door).hex ?? colourOf('facadeColor'));
+  col('garage', colourOf('garage'));
+  render();
+}
+
+function setModel() {
+  const n = glbName();
+  if (mv.dataset.glb !== n) {
+    const camKey = house.id + state.size;
+    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm, ty = 2] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg 74deg ${d}m`, `0m ${ty}m ${tz}m`]; }
+    mv.dataset.glb = n; mv.src = glbUrl(n);
+  }
+  else apply();
+}
+
+function render() {
+  document.querySelectorAll('[data-bind]').forEach(row => {
+    const k = row.dataset.bind;
+    row.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', !state.custom[k] && b.dataset.id === state[k]));
+    const lbl = document.getElementById('lbl-' + k);
+    if (lbl) lbl.textContent = state.custom[k] ?? find(k, state[k] ?? OPTIONS[k][0].id)?.name ?? '';
+  });
+  document.querySelectorAll('#extras button').forEach(b => b.setAttribute('aria-pressed', state[b.dataset.id]));
+  document.querySelectorAll('[data-custom]').forEach(i => { i.value = colourOf(i.dataset.custom).toLowerCase(); });
+  document.querySelectorAll('[data-custom-hex]').forEach(i => { if (document.activeElement !== i) i.value = colourOf(i.dataset.customHex); });
+}
+
+function buildRow(row) {
+  const k = row.dataset.bind, compact = row.hasAttribute('data-compact');
+  row.innerHTML = '';
+  for (const o of OPTIONS[k]) {
+    const b = document.createElement('button');
+    b.dataset.id = o.id; b.title = o.name; b.setAttribute('aria-label', o.name);
+    if (SWATCH_GROUPS.includes(k)) { b.className = 'sw'; b.style.background = o.hex; }
+    else {
+      b.className = 'chip';
+      const dot = 'hex' in o ? `<span class="dot" style="background:${o.hex ?? 'linear-gradient(135deg,#fff 50%,#2C3243 50%)'}"></span>` : '';
+      b.innerHTML = dot + (compact ? o.name.split(' ').slice(-1)[0] : o.name);
+    }
+    b.addEventListener('click', e => {
+      e.stopPropagation(); state[k] = o.id; delete state.custom[k]; if (k !== 'size') touched.add(k);
+      (k === 'muntins' || k === 'size') ? setModel() : apply();
+    });
+    row.appendChild(b);
+  }
+}
+document.querySelectorAll('[data-bind]').forEach(buildRow);
+for (const x of EXTRAS) {
+  const b = document.createElement('button');
+  b.className = 'chip'; b.dataset.id = x.id; b.textContent = '+ ' + x.name;
+  b.addEventListener('click', () => { state[x.id] = !state[x.id]; setModel(); });
+  document.getElementById('extras').appendChild(b);
+}
+
+const valid = h => /^#[0-9a-fA-F]{6}$/.test(h);
+document.querySelectorAll('[data-custom]').forEach(i => i.addEventListener('input', e => {
+  state.custom[i.dataset.custom] = e.target.value.toUpperCase(); touched.add(i.dataset.custom); apply();
+}));
+document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('input', e => {
+  let v = e.target.value.trim(); if (!v.startsWith('#')) v = '#' + v;
+  if (valid(v)) { state.custom[i.dataset.customHex] = v.toUpperCase(); touched.add(i.dataset.customHex); apply(); }
+}));
+
+mv.environmentImage = window.__SKY_URL ?? 'sky.hdr';
+mv.addEventListener('load', () => {
+  cache = {};
+  if (pendingCam) { mv.cameraOrbit = pendingCam[0]; mv.cameraTarget = pendingCam[1]; mv.jumpCameraToGoal(); pendingCam = null; }
+  apply();
+});
+// ---- persistence: URL hash + localStorage -------------------------------------
+function updateQR() {
+  const box = document.getElementById('qr'); if (!box || typeof qrcode === 'undefined') return;
+  const q = qrcode(0, 'M'); q.addData(configLink()); q.make();
+  box.innerHTML = q.createSvgTag({ cellSize: 4, margin: 0, scalable: true });
+}
+const KEYS = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','garage','fascia','deck','carport','panels'];
+const ORDER = ['size','facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck'];
+const CORDER = [...ORDER, 'garage'];
+function encodeState() {
+  let s = ORDER.map(k => Math.max(0, OPTIONS[k].findIndex(o => o.id === state[k])).toString(36)).join('');
+  s += (state.carport ? 1 : 0) + '' + (state.panels ? 1 : 0);
+  s += Math.max(0, OPTIONS.garage.findIndex(o => o.id === state.garage)).toString(36);
+  for (const [k, hex] of Object.entries(state.custom || {})) { const i = CORDER.indexOf(k); if (i >= 0) s += '-' + i.toString(36) + hex.replace('#', ''); }
+  return s;
+}
+function loadState(s) {
+  try {
+    const [main, ...cus] = s.split('-');
+    if (main.length < ORDER.length + 2) return false;
+    ORDER.forEach((k, i) => { const o = OPTIONS[k][parseInt(main[i], 36)]; if (o) state[k] = o.id; });
+    state.carport = main[ORDER.length] === '1'; state.panels = main[ORDER.length + 1] === '1';
+    state.garage = OPTIONS.garage[parseInt(main[ORDER.length + 2] || '0', 36)]?.id ?? 'fassaad';
+    state.custom = {};
+    cus.forEach(c => { const k = CORDER[parseInt(c[0], 36)]; const hex = '#' + c.slice(1).toUpperCase(); if (k && /^#[0-9A-F]{6}$/.test(hex)) state.custom[k] = hex; });
+    return true;
+  } catch { return false; }
+}
+const hIdx = () => HOUSES.indexOf(house);
+const snapshot = () => JSON.parse(JSON.stringify(state));
+function persist() {
+  const enc = encodeState();
+  saved[house.id] = snapshot();
+  try {
+    localStorage.setItem('hv4-house', house.id);
+    localStorage.setItem('hv4-saved', JSON.stringify(saved));
+    localStorage.setItem('hv4-touched', JSON.stringify([...touched]));
+  } catch {}
+  try { history.replaceState(null, '', location.pathname + location.search + '#h' + hIdx() + enc); } catch {}
+  updateQR();
+}
+function useHouse(h) {
+  house = h; OPTIONS.size = h.sizes;
+  buildRow(document.querySelector('.panel [data-bind="size"]'));
+}
+function switchHouse(dir) {
+  saved[house.id] = snapshot();
+  const prevState = snapshot();
+  const next = HOUSES[(hIdx() + dir + HOUSES.length) % HOUSES.length];
+  useHouse(next);
+  for (const k of Object.keys(state)) if (!['custom'].includes(k)) delete state[k];
+  if (saved[next.id]) Object.assign(state, saved[next.id]);
+  else {
+    // first visit: the house opens with its own look
+    Object.assign(state, next.defaults, { custom:{}, carport:false, panels:false });
+  }
+  setModel(); render();
+}
+document.getElementById('nav-prev').addEventListener('click', e => { e.stopPropagation(); switchHouse(-1); });
+document.getElementById('nav-next').addEventListener('click', e => { e.stopPropagation(); switchHouse(1); });
+try { Object.assign(saved, JSON.parse(localStorage.getItem('hv4-saved') || '{}')); touched = new Set(JSON.parse(localStorage.getItem('hv4-touched') || '[]')); } catch {}
+let fromHash = false;
+if (location.hash.startsWith('#h')) {
+  const h = HOUSES[parseInt(location.hash[2], 10)];
+  if (h) { useHouse(h); fromHash = loadState(location.hash.slice(3)); }
+} else if (location.hash.startsWith('#c')) {
+  fromHash = loadState(location.hash.slice(2));            // older Teder-only links
+}
+if (!fromHash) {
+  let id = null; try { id = localStorage.getItem('hv4-house'); } catch {}
+  const h = HOUSES.find(x => x.id === id);
+  if (h) { useHouse(h); if (saved[h.id]) Object.assign(state, saved[h.id]); }
+}
+if (!OPTIONS.size.some(o => o.id === state.size)) Object.assign(state, house.defaults);
+
+
+// ---- summary -------------------------------------------------------------------
+const LABELS = [['facadeMat','Fassaadi materjal'],['facadeColor','Fassaadi värv'],['roofMat','Katusekate'],['roofColor','Katuse värv'],
+  ['frame','Aknaraamid'],['muntins','Aknaruudud'],['door','Välisuks'],['fascia','Otsalauad'],['deck','Terrassilaud']];
+function summaryRows() {
+  const sz = find('size', state.size);
+  const rows = [['Maja', `${house.name} ${sz.short} m² – brutopind ${sz.brutto} m², netopind ${sz.netto} m²${house.id === 'teder' && sz.id === '270' ? ', garaažiga' : ''}`]];
+  for (const [k, l] of LABELS) {
+    const o = find(k, state[k]);
+    const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));
+    rows.push([l, v]);
+  }
+  if (hasGarage()) {
+    const o = find('garage', state.garage);
+    rows.push(['Garaažiuks', state.custom.garage ? `oma toon ${state.custom.garage}` : o.name + (o.hex ? ` (${o.hex})` : '')]);
+  }
+  if (house.extras.length) rows.push(['Lisad', [hasCarport() && 'autovarjualune', hasPanels() && 'terrassi ribiseinad'].filter(Boolean).join(', ') || 'ei']);
+  return rows;
+}
+function renderSummary() {
+  document.getElementById('summary').innerHTML = summaryRows().map(([a, b]) => `<dt>${a}</dt><dd>${b}</dd>`).join('');
+}
+const _render = render;
+render = function () {
+  _render(); renderSummary(); persist();
+  const sz = find('size', state.size);
+  document.querySelector('h1 .hn').textContent = `${house.name} ${sz.short} m²`;
+  document.title = `${house.name} ${sz.short} m² – proovi oma krundil`;
+  const pal = document.getElementById('ar-palette'); if (pal) pal.href = `${house.id}${state.size}_ar.usdz?v=${BUILD}`;
+  const ex = document.getElementById('extras');
+  ex.closest('.group').style.display = house.extras.length ? '' : 'none';
+  document.getElementById('grp-garage').style.display = hasGarage() ? '' : 'none';
+  ex.querySelectorAll('button').forEach(b => {
+    const x = EXTRAS.find(e => e.id === b.dataset.id);
+    b.style.display = house.extras.includes(x.id) ? '' : 'none';
+    b.textContent = (state[x.id] ? '✓ ' : '+ ') + x.name;
+  });
+  const n = HOUSES.length, i = hIdx();
+  document.querySelector('#nav-prev .nm').textContent = HOUSES[(i - 1 + n) % n].name;
+  document.querySelector('#nav-next .nm').textContent = HOUSES[(i + 1) % n].name;
+};
+
+const PUBLIC_URL = /^https?:$/.test(location.protocol) && !window.__GLB ? location.origin + location.pathname
+                                                                      : 'https://avatarapps.github.io/homeview/i0k9g95har/';
+const configLink = () => PUBLIC_URL + '#h' + hIdx() + encodeState();
+document.getElementById('copy-link').addEventListener('click', async e => {
+  const btn = e.currentTarget;
+  try { await navigator.clipboard.writeText(configLink()); } catch {}
+  btn.textContent = 'Kopeeritud ✓'; setTimeout(() => btn.textContent = 'Kopeeri link nende valikutega', 1600);
+});
+document.getElementById('go-quote').addEventListener('click', () => document.getElementById('pakkumine').scrollIntoView({ behavior: 'smooth' }));
+
+// ---- quote request ---------------------------------------------------------------
+const fileInput = document.querySelector('#qform input[type=file]');
+fileInput.addEventListener('change', () => {
+  const t = document.getElementById('thumbs'); t.innerHTML = '';
+  [...fileInput.files].forEach(f => { const i = document.createElement('img'); i.src = URL.createObjectURL(f); t.appendChild(i); });
+});
+const STARTED = Date.now();
+const API = 'https://www.secondsun.ee/api/homeview-paring';
+document.getElementById('qform').addEventListener('submit', async e => {
+  e.preventDefault();
+  const form = e.target, f = new FormData(form), msg = document.getElementById('qmsg');
+  const btn = form.querySelector('button[type=submit]');
+  const sz = find('size', state.size);
+  const meta = {
+    house: `${house.name} ${sz.short} m²`, summary: summaryRows(), link: configLink(),
+    name: f.get('nimi'), email: f.get('email'), phone: f.get('tel'), plot: f.get('krunt'),
+    stage: f.get('valmidus'), timing: f.get('aeg'), info: f.get('info'), website: f.get('website'), startedAt: STARTED,
+  };
+  const body = new FormData();
+  body.append('meta', JSON.stringify(meta));
+  [...fileInput.files].slice(0, 5).forEach(file => body.append('files', file, file.name));
+  btn.disabled = true; btn.textContent = 'Saadan…'; msg.textContent = '';
+  try {
+    const res = await fetch(API, { method: 'POST', body });
+    const out = await res.json().catch(() => ({}));
+    if (res.ok && out.ok) {
+      form.reset(); document.getElementById('thumbs').innerHTML = '';
+      btn.textContent = 'Päring saadetud ✓';
+      msg.textContent = 'Aitäh! Müüja võtab sinuga ühendust.';
+      return;
+    }
+    msg.textContent = out.message || 'Saatmine ebaõnnestus. Proovi uuesti.';
+  } catch {
+    msg.textContent = 'Saatmine ebaõnnestus – kontrolli internetiühendust ja proovi uuesti.';
+  }
+  btn.disabled = false; btn.textContent = 'Saada päring';
+});
+
+if (/iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)) document.body.classList.add('is-ios');
+// header AR button (phone layout) starts the same AR session as the in-viewer button
+const hdrAr = document.getElementById('hdr-ar');
+// --- AR distance: the house is pushed this far away from the point where AR anchors it,
+// so it lands where it should stand on the plot instead of on top of the viewer.
+const AR_DISTS = [3, 10, 20, 30];
+let arDist = +(localStorage.getItem('hv-ardist') || 10);
+if (!AR_DISTS.includes(arDist)) arDist = 10;
+const distRow = document.getElementById('ardist');
+const drawDist = () => {
+  distRow.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', +b.dataset.m === arDist));
+  document.getElementById('lbl-ardist').textContent = arDist + ' m';
+};
+for (const m of AR_DISTS) {
+  const b = document.createElement('button'); b.className = 'chip'; b.dataset.m = m; b.textContent = m + ' m';
+  b.addEventListener('click', () => { arDist = m; try { localStorage.setItem('hv-ardist', m); } catch (e) {} drawDist(); });
+  distRow.appendChild(b);
+}
+drawDist();
+const sceneOf = v => { const k = Object.getOwnPropertySymbols(v).find(x => x.description === 'scene'); return k ? v[k] : null; };
+let arShift = 0;
+const shiftHouse = dz => {
+  const sc = sceneOf(mv); if (!sc || !sc.models) return false;
+  for (const m of sc.models) { m.position.z += dz; m.updateMatrixWorld(true); }
+  arShift += dz; return true;
+};
+const unshift = () => { if (arShift) shiftHouse(-arShift); };
+let xrStarted = false;
+mv.addEventListener('ar-status', e => {
+  if (e.detail.status === 'session-started') xrStarted = true;
+  if (e.detail.status === 'not-presenting' || e.detail.status === 'failed') { xrStarted = false; unshift(); }
+});
+async function startAR() {
+  if (!mv.canActivateAR) { mv.scrollIntoView(); return; }
+  unshift();
+  shiftHouse(-(arDist - 1));          // the model's front edge sits 1 m from its origin
+  try { await mv.activateAR(); }
+  finally { if (!xrStarted) unshift(); }   // Quick Look got its own copy; WebXR keeps it until the session ends
+}
+hdrAr.addEventListener('click', startAR);
+const slotBtn = document.querySelector('.ar-btn');
+slotBtn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); startAR(); }, true);
+document.getElementById('mv').addEventListener('load', e => { if (!e.target.canActivateAR) hdrAr.style.display = 'none'; document.body.classList.toggle('can-ar', !!e.target.canActivateAR); });
+const setHH = () => document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
+new ResizeObserver(setHH).observe(document.querySelector('header')); setHH();
+addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive:true });
+setModel();
+render();
+</script>
+</body>
+</html>

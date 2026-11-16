@@ -103,6 +103,7 @@
   #thumbs:empty { display:none; }
   /* phone: short title + inviting AR button in the header, nothing covering the house */
   .hdr-ar { display:none; }
+  .single-house .house-nav { display:none !important; }
   body:not(.can-ar) #grp-ardist { display:none; }
   @keyframes arPulse { 0% { box-shadow:0 0 0 0 rgba(29,31,34,.45), 0 4px 14px rgba(0,0,0,.22); }
                        70% { box-shadow:0 0 0 12px rgba(29,31,34,0), 0 4px 14px rgba(0,0,0,.22); }
@@ -229,6 +230,7 @@ const OPTIONS = {
     { id:'boards_v', name:'Laudis, vertikaalne', tex:'boards_v' },
     { id:'boards_h', name:'Laudis, horisontaalne', tex:'boards_h' },
     { id:'plaster',  name:'Krohv', tex:'plaster' },
+    { id:'palk',     name:'Palk', tex:'logs' },
   ],
   facadeColor: [
     { id:'tormisinine', name:'Tormisinine', hex:'#2C3243' },
@@ -243,6 +245,7 @@ const OPTIONS = {
     { id:'punamuld', name:'Punamuld', hex:'#7A2E22' },
     { id:'ooker',    name:'Ooker', hex:'#B98A3E' },
     { id:'puit',     name:'Naturaalne puit', hex:'#CC9A5E' },
+    { id:'meepruun', name:'Meepruun', hex:'#A06A38' },
   ],
   roofMat: [
     { id:'sindel', name:'Bituumensindel', tex:'shingle', rough:0.85, metal:0 },
@@ -304,19 +307,28 @@ const OPTIONS = {
     { id:'komposiit', name:'Grafiit komposiit', hex:'#55534F' },
   ],
 };
-const HOUSES = [
-  { id:'teder', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
+const ALL_HOUSES = [
+  { id:'teder', catalog:'soomemaja', name:'Teder', extras:['carport','panels'], sizes: OPTIONS.size,
     cam:{ '187':[27,-6.5,-25,36], '224':[30,-7,-25,40], '270':[36,-8.5,-25,48] },
     defaults:{ size:'224', facadeMat:'boards_v', facadeColor:'tormisinine', roofMat:'sindel', roofColor:'tumesinine', frame:'valge', muntins:'jah', fascia:'valge', door:'tamm', garage:'fassaad', deck:'lehis' } },
-  { id:'oobik', name:'Ööbik', extras:[],
+  { id:'oobik', catalog:'soomemaja', name:'Ööbik', extras:[],
     sizes:[ { id:'129', name:'Bruto 128,7 m² · neto 101,7 m²', short:'129', brutto:'128,7', netto:'101,7' } ],
     cam:{ '129':[30,-10,-35,40] },
     defaults:{ size:'129', facadeMat:'boards_v', facadeColor:'puit', roofMat:'valts', roofColor:'must', frame:'must', muntins:'ei', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
-  { id:'hiireviu', name:'Hiireviu', extras:[],
+  { id:'hiireviu', catalog:'soomemaja', name:'Hiireviu', extras:[],
     sizes:[ { id:'161', name:'Bruto 160,7 m² · neto 114,4 m²', short:'161', brutto:'160,7', netto:'114,4' } ],
     cam:{ '161':[27,-7.8,35,35,2.6] },
     defaults:{ size:'161', facadeMat:'boards_v', facadeColor:'puit', roofMat:'betoon', roofColor:'hall', frame:'must', muntins:'jah', fascia:'tume', door:'must', garage:'fassaad', deck:'lehis' } },
+  { id:'metsamaja', catalog:'demo', name:'Metsamaja', extras:[],
+    sizes:[ { id:'137', name:'Bruto 136,8 m² · neto 108,0 m²', short:'137', brutto:'136,8', netto:'108,0' } ],
+    cam:{ '137':[24,-7.7,-30,31,2.4] },
+    defaults:{ size:'137', facadeMat:'palk', facadeColor:'meepruun', roofMat:'laast', roofColor:'laast', frame:'pruun', muntins:'jah', fascia:'fassaad', door:'tamm', garage:'fassaad', deck:'kuldne' } },
 ];
+// which houses this link shows: the Soome Maja demo lives in its own private folder, everything else is our demo house
+const CATALOG = new URLSearchParams(location.search).get('k')
+  || (location.pathname.includes('i0k9g95har') || window.__GLB ? 'soomemaja' : 'demo');
+const HOUSES = ALL_HOUSES.filter(h => h.catalog === CATALOG);
+if (HOUSES.length < 2) document.documentElement.classList.add('single-house');
 let house = HOUSES[0];
 let pendingCam = null;
 const saved = {};
@@ -547,7 +559,8 @@ render = function () {
   document.querySelector('#nav-next .nm').textContent = HOUSES[(i + 1) % n].name;
 };
 
-const PUBLIC_URL = 'https://avatarapps.github.io/homeview/i0k9g95har/';
+const PUBLIC_URL = /^https?:$/.test(location.protocol) && !window.__GLB ? location.origin + location.pathname
+                                                                      : 'https://avatarapps.github.io/homeview/i0k9g95har/';
 const configLink = () => PUBLIC_URL + '#h' + hIdx() + encodeState();
 document.getElementById('copy-link').addEventListener('click', async e => {
   const btn = e.currentTarget;

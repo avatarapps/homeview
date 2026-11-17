@@ -6,6 +6,7 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Teder 224 m² – proovi oma krundil</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;1,500&display=swap">
+<script type="importmap">{"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"}}</script>
 <script type="module" src="https://cdn.jsdelivr.net/npm/@google/model-viewer@4/dist/model-viewer.min.js"></script>
 <style>
   :root { --ink:#1d1f22; --muted:#6b6f75; --line:#e3e1dc; --bg:#f6f5f2; }
@@ -358,7 +359,9 @@ async function setTex(m, base, normal = true) {
 }
 const col = (name, hex) => mat(name)?.pbrMetallicRoughness.setBaseColorFactor(hex);
 
-async function apply() {
+let applying = Promise.resolve();   // the AR export waits for colours and textures to be in place
+function apply() { applying = applyNow(); return applying; }
+async function applyNow() {
   if (!mv.model) return;
   const fm = find('facadeMat', state.facadeMat), rm = find('roofMat', state.roofMat);
   await setTex(mat('wall'), fm.tex);
@@ -663,10 +666,32 @@ function clipLink() {
   return 'https://homeview.secondsun.ee/ar?' + p.toString();
 }
 
+// --- Android: our own WebXR AR view (same controls as the iPhone app); Scene Viewer stays as fallback ---
+let webar = null;   // the loaded module once WebXR AR is known to work on this device
+if (!IS_IOS && navigator.xr) {
+  import('./webar.js').then(async m => {
+    if (await m.webARSupported()) { webar = m; document.body.classList.add('can-ar'); hdrAr.style.display = ''; }
+  }).catch(() => {});
+}
+let webarOn = false;
+async function startWebAR() {
+  if (webarOn) return; webarOn = true;
+  const sz = find('size', state.size);
+  try {
+    await webar.startWebAR({
+      title: `${house.name} ${sz.short} m²`,
+      distance: arDist,
+      getModel: async () => { try { await applying; } catch (e) {} return mv.exportScene({ binary: true }); },
+      onEnd: () => { webarOn = false; },
+    });
+  } catch (e) { webarOn = false; if (mv.canActivateAR) mv.activateAR(); }
+}
+
 async function startAR() {
   if (IS_IOS && !window.__GLB && (APP_CLIP_READY || new URLSearchParams(location.search).has('clip'))) {
     location.href = clipLink(); return;
   }
+  if (webar) { startWebAR(); return; }
   if (!mv.canActivateAR) { mv.scrollIntoView(); return; }
   unshift();
   shiftHouse(-(arDist - 1));          // the model's front edge sits 1 m from its origin
@@ -676,7 +701,7 @@ async function startAR() {
 hdrAr.addEventListener('click', startAR);
 const slotBtn = document.querySelector('.ar-btn');
 slotBtn.addEventListener('click', e => { e.stopPropagation(); e.preventDefault(); startAR(); }, true);
-document.getElementById('mv').addEventListener('load', e => { if (!e.target.canActivateAR) hdrAr.style.display = 'none'; document.body.classList.toggle('can-ar', !!e.target.canActivateAR); });
+document.getElementById('mv').addEventListener('load', e => { const ok = !!e.target.canActivateAR || !!webar; if (!ok) hdrAr.style.display = 'none'; document.body.classList.toggle('can-ar', ok); });
 const setHH = () => document.documentElement.style.setProperty('--hh', document.querySelector('header').offsetHeight + 'px');
 new ResizeObserver(setHH).observe(document.querySelector('header')); setHH();
 addEventListener('scroll', () => document.body.classList.toggle('scrolled', scrollY > 40), { passive:true });

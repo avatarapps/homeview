@@ -1,0 +1,120 @@
+// Shared option library. A client's client.js can replace any list (options: { roofMat: [...] })
+// or hide a whole group (hidden: ['garage']). Ids end up in saved links by their POSITION in the
+// list, so once a client is live only ever append to its lists, never reorder or delete.
+// Textures (tex) are file names in engine/tex/ – add new ones, never change existing files.
+export const LIBRARY = {
+  facadeMat: [
+    { id:'boards_v', name:'Laudis, vertikaalne', tex:'boards_v' },
+    { id:'boards_h', name:'Laudis, horisontaalne', tex:'boards_h' },
+    { id:'plaster',  name:'Krohv', tex:'plaster' },
+    { id:'palk',     name:'Palk', tex:'logs' },
+  ],
+  facadeColor: [
+    { id:'tormisinine', name:'Tormisinine', hex:'#2C3243' },
+    { id:'grafiit',  name:'Grafiit', hex:'#3A3D42' },
+    { id:'sysimust', name:'Süsimust', hex:'#1F2023' },
+    { id:'metsaroheline', name:'Metsaroheline', hex:'#3D4A3E' },
+    { id:'sinihall', name:'Sinakashall', hex:'#5E6B78' },
+    { id:'graniit',  name:'Graniithall', hex:'#8C8F8E' },
+    { id:'liivakivi', name:'Liivakivi', hex:'#CFC6B4' },
+    { id:'kriit',    name:'Kriit', hex:'#E4E0D6' },
+    { id:'lumivalge', name:'Lumivalge', hex:'#F2F0EA' },
+    { id:'punamuld', name:'Punamuld', hex:'#7A2E22' },
+    { id:'ooker',    name:'Ooker', hex:'#B98A3E' },
+    { id:'puit',     name:'Naturaalne puit', hex:'#CC9A5E' },
+    { id:'meepruun', name:'Meepruun', hex:'#A06A38' },
+  ],
+  roofMat: [
+    { id:'sindel', name:'Bituumensindel', tex:'shingle', rough:0.85, metal:0 },
+    { id:'valts', name:'Valtsplekk', tex:'seam', rough:0.6, metal:0.12 },
+    { id:'profiil', name:'Kivikattepleki profiil', tex:'metaltile', rough:0.55, metal:0.15 },
+    { id:'betoon', name:'Betoonkivi', tex:'tile', rough:0.85, metal:0 },
+    { id:'savi', name:'Savikivi', tex:'claytile', rough:0.75, metal:0 },
+    { id:'laast', name:'Puitlaast', tex:'woodshingle', rough:0.9, metal:0 },
+  ],
+  roofColor: [
+    { id:'tumesinine', name:'Tumesinine', hex:'#2B313C' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#2E3136' },
+    { id:'tumehall', name:'Tumehall', hex:'#43474D' },
+    { id:'hall', name:'Hall', hex:'#727272' },
+    { id:'hobe', name:'Hõbe', hex:'#A7AAAD' },
+    { id:'tumepruun', name:'Tumepruun', hex:'#3E2F27' },
+    { id:'punane', name:'Punane', hex:'#8E3B2A' },
+    { id:'telliskivi', name:'Telliskivi', hex:'#A0522D' },
+    { id:'roheline', name:'Tumeroheline', hex:'#2F3D33' },
+    { id:'laast', name:'Naturaalne laast', hex:'#9C7B57' },
+  ],
+  frame: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'kreem', name:'Kreemjas', hex:'#E8E0CF' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'tumehall', name:'Tumehall', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'pruun', name:'Pruun', hex:'#5A4232' },
+  ],
+  muntins: [ { id:'jah', name:'Ruutudega' }, { id:'ei', name:'Ilma ruutudeta' } ],
+  fascia: [
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'tume', name:'Tume', hex:'#2A2D31' },
+  ],
+  door: [
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+    { id:'pahkel', name:'Pähkel', hex:'#5A4232' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'punane', name:'Punane', hex:'#7A2E22' },
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+  ],
+  garage: [
+    { id:'fassaad', name:'Fassaadiga sama', hex:null },
+    { id:'valge', name:'Valge', hex:'#F2F0EA' },
+    { id:'helehall', name:'Helehall', hex:'#BFC1C0' },
+    { id:'grafiit', name:'Grafiit', hex:'#3A3D42' },
+    { id:'must', name:'Must', hex:'#1C1D1F' },
+    { id:'tamm', name:'Tamm', hex:'#8A6A4C' },
+  ],
+  deck: [
+    { id:'lehis', name:'Lehis', hex:'#C79F76' },
+    { id:'kuldne', name:'Kuldne mänd', hex:'#C9A36C' },
+    { id:'hallpuit', name:'Hallikas puit', hex:'#9C978D' },
+    { id:'pahkel', name:'Pähkel', hex:'#6B4E36' },
+    { id:'komposiit', name:'Grafiit komposiit', hex:'#55534F' },
+  ],
+};
+
+// Option groups the engine knows. kind: chips | swatches; custom: free colour code input.
+// What a group does to the model is defined in configurator.js (applyNow).
+export const GROUPS = [
+  { key:'size',        label:'Maja suurus' },
+  { key:'facadeMat',   label:'Fassaadi materjal' },
+  { key:'facadeColor', label:'Fassaadi värv', swatches:true, custom:true },
+  { key:'roofMat',     label:'Katusekate' },
+  { key:'roofColor',   label:'Katuse värv', swatches:true, custom:true },
+  { key:'frame',       label:'Aknaraamid', custom:true },
+  { key:'muntins',     label:'Aknaruudud' },
+  { key:'door',        label:'Välisuks', custom:true },
+  { key:'garage',      label:'Garaažiuks', custom:true },
+  { key:'fascia',      label:'Otsalauad' },
+  { key:'deck',        label:'Terrassilaud', custom:true },
+];
+
+export const TEXTS = {
+  tagline: 'proovi oma krundil',
+  arButton: 'Vaata oma krundil',
+  lock: 'Mõõdud lukus · 1:1',
+  qrTitle: 'Vaata seda maja oma krundil',
+  qrSub: 'Skaneeri telefoniga – maja avaneb sinu valikutega päris suuruses.',
+  arDist: 'Maja esikülg sinust AR-is',
+  extras: 'Lisad',
+  note: 'Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt ja lisa see allpool päringule.',
+  yourChoice: 'Sinu valik',
+  askQuote: 'Küsi pakkumist',
+  copyLink: 'Kopeeri link nende valikutega',
+  copied: 'Kopeeritud ✓',
+  sent: 'Aitäh! Müüja võtab sinuga ühendust.',
+  stages: ['Tehasepakett', 'Valge karp', 'Võtmed kätte', 'Ei tea veel'],
+  timings: ['0–6 kuu jooksul', '6–12 kuu jooksul', '1–2 aasta jooksul', 'Uurin alles'],
+};

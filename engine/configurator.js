@@ -413,7 +413,7 @@ function clipLink() {
   });
   // Apple's own App Clip link: iOS shows the App Clip card straight over the page (no extra page, no install);
   // the clip/app receives this URL with all parameters. Old /ar links still work through the worker.
-  return 'https://appclip.apple.com/id?p=ee.secondsun.homeview.Clip&' + p.toString();
+  return 'https://appclip.apple.com/id?p=ee.secondsun.homeview.Clip&' + p.toString().replace(/\+/g, '%20');   // the app reads + literally
 }
 
 // --- Android: our own WebXR AR view (same controls as the iPhone app); Scene Viewer stays as fallback ---

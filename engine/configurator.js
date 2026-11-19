@@ -394,7 +394,7 @@ mv.addEventListener('ar-status', e => {
 });
 
 // --- iPhone: the Homeview App Clip (free dragging, nudge buttons, distance readout) ---
-const APP_CLIP_READY = false;     // switch on once the App Clip is live; ?clip=1 forces it for testing
+const APP_CLIP_READY = true;      // switch on once the App Clip is live; ?clip=1 forces it for testing
 const hexOf = h => (h || '').replace('#', '');
 function clipLink() {
   const sz = find('size', state.size);

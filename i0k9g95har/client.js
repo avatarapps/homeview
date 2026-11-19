@@ -9,7 +9,7 @@ export default {
   id: 'soomemaja',
   name: 'Soome Maja',
   publicUrl: 'https://homeview.secondsun.ee/i0k9g95har/',
-  build: '20261119a',
+  build: '20261119b',
   extras: [ { id:'carport', name:'Autovarjualune' }, { id:'panels', name:'Terrassi ribiseinad' } ],
   houses: [
     { id:'teder', name:'Teder', extras:['carport','panels'], sizes: SIZES_TEDER, garage:['270'],

@@ -62,7 +62,6 @@ document.body.insertAdjacentHTML('afterbegin', `
     <div class="label">${esc(T.yourChoice)}</div>
     <dl id="summary"></dl>
     <div class="cta-bar">
-      <button class="primary" type="button" id="go-quote">${esc(T.askQuote)}</button>
       <button class="secondary" type="button" id="copy-link">${esc(T.copyLink)}</button>
     </div>
   </div>
@@ -80,7 +79,7 @@ document.body.insertAdjacentHTML('afterbegin', `
     <div id="thumbs"></div>
     <label>Lisainfo<textarea name="info" rows="3" placeholder="nt soovin saunat, laiemat terrassi …"></textarea></label>
     <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0">
-    <button class="primary" type="submit">Saada päring</button>
+    <button class="primary" type="submit">${esc(T.askQuote)}</button>
     <div class="sub" id="qmsg"></div>
   </form>
 </section>`);
@@ -321,7 +320,6 @@ document.getElementById('copy-link').addEventListener('click', async e => {
   try { await navigator.clipboard.writeText(configLink()); } catch {}
   btn.textContent = T.copied; setTimeout(() => btn.textContent = T.copyLink, 1600);
 });
-document.getElementById('go-quote').addEventListener('click', () => document.getElementById('pakkumine').scrollIntoView({ behavior: 'smooth' }));
 
 // ---- quote request -------------------------------------------------------------------
 const fileInput = document.querySelector('#qform input[type=file]');
@@ -359,7 +357,7 @@ document.getElementById('qform').addEventListener('submit', async e => {
   } catch {
     msg.textContent = 'Saatmine ebaõnnestus – kontrolli internetiühendust ja proovi uuesti.';
   }
-  btn.disabled = false; btn.textContent = 'Saada päring';
+  btn.disabled = false; btn.textContent = T.askQuote;
 });
 
 const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);

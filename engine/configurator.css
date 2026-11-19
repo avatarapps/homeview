@@ -31,7 +31,7 @@
   .ar-bar .chip { padding:6px 10px; font-size:13px; }
   .quote { padding:22px 16px 40px; max-width:900px; border-top:8px solid #ebe8e2; }
   .quote h2 { font-size:19px; margin:0 0 4px; }
-  .quote form { display:grid; gap:12px; margin-top:14px; max-width:520px; }
+  .quote form { display:grid; gap:12px; margin-top:14px; max-width:420px; }
   .quote label { display:grid; gap:5px; font-size:13px; color:var(--muted); }
   .quote input, .quote select, .quote textarea { font:inherit; color:var(--ink); padding:10px 11px; border:1px solid var(--line); border-radius:10px; background:#fff; }
   .primary { border:0; border-radius:24px; background:var(--ink); color:#fff; font-size:15px; font-weight:600; padding:13px 20px; cursor:pointer; }

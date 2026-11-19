@@ -7,6 +7,7 @@ export default {
   build: '20261118a',
   extras: [],
   hidden: ['garage'],
+  texts: { areaA: 'kogupind', areaB: 'põrandapind' },   // Finnlog: kogupind includes terraces
   houses: [
     { id:'modi', name:'Modi', extras:[],
       sizes:[ { id:'170', name:'Kogupind 170,0 m² · põrandapind 145,0 m²', short:'170', brutto:'170,0', netto:'145,0' } ],

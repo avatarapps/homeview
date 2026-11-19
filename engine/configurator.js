@@ -279,7 +279,7 @@ const labelOf = k => (C.labels || {})[k] || GROUPS.find(g => g.key === k).label;
 const SUMMARY = ['facadeMat','facadeColor','roofMat','roofColor','frame','muntins','door','fascia','deck'].filter(k => !HIDDEN.has(k));
 function summaryRows() {
   const sz = find('size', state.size);
-  const rows = [['Maja', `${house.name} ${sz.short} m² – brutopind ${sz.brutto} m², netopind ${sz.netto} m²${hasGarage() ? ', garaažiga' : ''}`]];
+  const rows = [['Maja', `${house.name} ${sz.short} m² – ${T.areaA} ${sz.brutto} m², ${T.areaB} ${sz.netto} m²${hasGarage() ? ', garaažiga' : ''}`]];
   for (const k of SUMMARY) {
     const o = find(k, state[k]);
     const v = state.custom[k] ? `oma toon ${state.custom[k]}` : (o.name + (o.hex ? ` (${o.hex})` : ''));

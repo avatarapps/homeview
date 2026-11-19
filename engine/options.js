@@ -111,7 +111,7 @@ export const TEXTS = {
   extras: 'Lisad',
   areaA: 'brutopind',           // size row in summary and enquiry: first area (sizes[].brutto)
   areaB: 'netopind',            // second area (sizes[].netto)
-  note: 'Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Tee AR-is pilt ja lisa see allpool päringule.',
+  note: 'Maja on päris mõõdus ja AR-is ei saa seda suuremaks ega väiksemaks teha – ainult liigutada ja pöörata. „Vaata oma krundil“ avab AR-i täpselt nende valikutega, mis siin tegid. Soovi korral lisa AR-is tehtud pilt päringule.',
   yourChoice: 'Sinu valik',
   askQuote: 'Küsi pakkumist',
   copyLink: 'Kopeeri link nende valikutega',

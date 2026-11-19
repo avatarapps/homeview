@@ -13,6 +13,10 @@ const EXTRAS = C.extras || [];
 const HOUSES = C.houses;
 const BUILD = C.build || '1';                            // bump in client.js on every model update (cache)
 const KEY = 'hv5-' + C.id;                               // per-client storage: clients never see each other's state
+// Test: landscape around the house (?maastik=1|2). Light stays from sky.hdr so colours don't change;
+// the photo is only the visible backdrop, projected onto the ground. Panoramas: Poly Haven, CC0.
+const SCENE = { 1: 'mets', 2: 'niit' }[new URLSearchParams(location.search).get('maastik')];
+const POLAR = SCENE ? 81 : 74;                           // lower camera shows the horizon behind the house
 
 // ---- page --------------------------------------------------------------------------
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;' }[c]));
@@ -138,7 +142,7 @@ function setModel() {
   const n = glbName();
   if (mv.dataset.glb !== n) {
     const camKey = house.id + state.size;
-    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm, ty = 2] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg 74deg ${d}m`, `0m ${ty}m ${tz}m`]; }
+    if (mv.dataset.cam !== camKey) { mv.dataset.cam = camKey; const [d0, tz, az = -25, dm, ty = 2] = house.cam[state.size]; const d = innerWidth < 700 ? (dm ?? d0) : d0; pendingCam = [`${az}deg ${POLAR}deg ${d}m`, `0m ${ty}m ${tz}m`]; }
     mv.dataset.glb = n; mv.src = glbUrl(n);
     mv.alt = `${house.name} 3D-mudel`;
   }
@@ -195,6 +199,10 @@ document.querySelectorAll('[data-custom-hex]').forEach(i => i.addEventListener('
 }));
 
 mv.environmentImage = new URL('sky.hdr', ENGINE).href;
+if (SCENE) {
+  mv.skyboxImage = new URL(`scene/${SCENE}.jpg`, ENGINE).href;
+  mv.setAttribute('skybox-height', '2m');
+}
 mv.addEventListener('load', () => {
   cache = {};
   if (pendingCam) { mv.cameraOrbit = pendingCam[0]; mv.cameraTarget = pendingCam[1]; mv.jumpCameraToGoal(); pendingCam = null; }

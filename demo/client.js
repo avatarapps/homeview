@@ -4,7 +4,7 @@ export default {
   id: 'demo',
   name: 'Homeview demo',
   publicUrl: 'https://homeview.secondsun.ee/',
-  build: '20261119g',
+  build: '20261120a',
   extras: [],
   houses: [
     { id:'sume', name:'Sume', extras:[],
